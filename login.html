@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login — Curaah</title>
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg" />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    body { background: var(--navy); min-height: 100vh; }
+
+    .login-page {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: calc(var(--nav-height) + 24px) 5% 40px;
+      position: relative;
+      overflow: hidden;
+    }
+    .login-page::before {
+      content: '';
+      position: absolute;
+      top: -140px; right: -140px;
+      width: 420px; height: 420px;
+      background: radial-gradient(circle, rgba(61,158,255,0.16), transparent 70%);
+      border-radius: 50%;
+    }
+    .login-page::after {
+      content: '';
+      position: absolute;
+      bottom: -160px; left: -120px;
+      width: 380px; height: 380px;
+      background: radial-gradient(circle, rgba(0,212,170,0.1), transparent 70%);
+      border-radius: 50%;
+    }
+
+    .login-card {
+      background: var(--white);
+      border-radius: var(--radius-xl);
+      padding: 40px 38px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: var(--shadow-lg);
+      position: relative;
+      z-index: 1;
+    }
+
+    .login-logo { display: flex; align-items: center; gap: 10px; margin-bottom: 26px; }
+    .login-logo-name { font-size: 20px; font-weight: 700; color: var(--navy); font-family: 'Georgia', serif; }
+    .login-logo-tag  { font-size: 10px; color: var(--electric); font-weight: 600; letter-spacing: 0.5px; display: block; }
+
+    .login-title { font-family: 'Georgia', serif; font-size: 25px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; }
+    .login-sub   { font-size: 14px; color: var(--text-muted); margin-bottom: 24px; line-height: 1.6; }
+
+    .login-error {
+      background: rgba(255,71,87,0.06);
+      border: 1px solid rgba(255,71,87,0.2);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      font-size: 13px;
+      color: var(--danger);
+      display: none;
+      line-height: 1.5;
+      margin-bottom: 16px;
+    }
+    .login-error.show { display: block; }
+
+    .login-success {
+      background: rgba(0,196,140,0.06);
+      border: 1px solid rgba(0,196,140,0.2);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      font-size: 13px;
+      color: var(--success);
+      display: none;
+      line-height: 1.5;
+      margin-bottom: 16px;
+    }
+    .login-success.show { display: block; }
+
+    .login-forgot { text-align: right; margin-top: -6px; margin-bottom: 18px; }
+    .login-forgot a { font-size: 12.5px; color: var(--electric); font-weight: 600; }
+
+    .login-divider {
+      display: flex; align-items: center; gap: 12px;
+      margin: 22px 0; color: var(--text-muted); font-size: 12px;
+    }
+    .login-divider::before, .login-divider::after {
+      content: ''; flex: 1; height: 1px; background: var(--border-card);
+    }
+
+    .login-footer-link { font-size: 13px; color: var(--text-muted); text-align: center; margin-top: 4px; }
+    .login-footer-link a { color: var(--electric); font-weight: 600; }
+
+    /* Forgot password panel */
+    .forgot-panel { display: none; }
+    .forgot-panel.active { display: block; }
+    .login-form-panel.hidden-panel { display: none; }
+
+    .back-to-login { font-size: 13px; color: var(--text-muted); margin-bottom: 18px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+    .back-to-login:hover { color: var(--electric); }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <a href="index.html" class="nav-logo">
+      <svg class="nav-logo-icon" viewBox="0 0 36 36" fill="none">
+        <path d="M18 3 L5 9 L5 21 Q5 30 18 34 Q31 30 31 21 L31 9 Z" fill="#0f1f3d" stroke="#3d9eff" stroke-width="1.5"/>
+        <path d="M18 10 Q13 15 13 20 Q13 25 18 28 Q23 25 23 20 Q23 15 18 10Z" fill="#3d9eff" opacity="0.9"/>
+        <circle cx="18" cy="22" r="3.5" fill="white"/>
+      </svg>
+      <div class="nav-logo-text">
+        <span class="nav-logo-name">curaah</span>
+        <span class="nav-logo-tag">AI Health Companion</span>
+      </div>
+    </a>
+    <div class="nav-actions">
+      <a href="register.html" class="btn btn-ghost btn-sm">New here? Create account</a>
+    </div>
+  </nav>
+
+  <div class="login-page">
+    <div class="login-card">
+
+      <div class="login-logo">
+        <svg width="32" height="32" viewBox="0 0 36 36" fill="none">
+          <path d="M18 3 L5 9 L5 21 Q5 30 18 34 Q31 30 31 21 L31 9 Z" fill="#0f1f3d" stroke="#3d9eff" stroke-width="1.5"/>
+          <path d="M18 10 Q13 15 13 20 Q13 25 18 28 Q23 25 23 20 Q23 15 18 10Z" fill="#3d9eff" opacity="0.9"/>
+          <circle cx="18" cy="22" r="3.5" fill="white"/>
+        </svg>
+        <div><div class="login-logo-name">curaah</div><div class="login-logo-tag">YOUR HEALTH, REMEMBERED</div></div>
+      </div>
+
+      <!-- ═══════ LOGIN PANEL ═══════ -->
+      <div class="login-form-panel" id="loginPanel">
+        <div class="login-title">Welcome back</div>
+        <div class="login-sub">Your companion has been keeping track. Let's continue.</div>
+
+        <div class="login-error" id="loginError"></div>
+
+        <div class="form-group">
+          <label class="form-label">Email or Phone Number</label>
+          <input class="form-input" type="text" id="loginIdentifier" placeholder="your@email.com or phone number" autocomplete="username" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input class="form-input" type="password" id="loginPassword" placeholder="Enter your password" autocomplete="current-password" />
+        </div>
+
+        <div class="login-forgot">
+          <a onclick="showForgotPanel()">Forgot password?</a>
+        </div>
+
+        <button class="btn btn-primary btn-full btn-lg" id="loginBtn" onclick="handleLogin()">
+          Login to Curaah
+        </button>
+
+        <p class="login-footer-link" style="margin-top:20px;">
+          New to Curaah? <a href="register.html">Create your free account →</a>
+        </p>
+      </div>
+
+      <!-- ═══════ FORGOT PASSWORD PANEL ═══════ -->
+      <div class="forgot-panel" id="forgotPanel">
+        <span class="back-to-login" onclick="showLoginPanel()">← Back to login</span>
+        <div class="login-title">Reset your password</div>
+        <div class="login-sub">Enter the email linked to your account and we'll send you a reset link.</div>
+
+        <div class="login-error" id="forgotError"></div>
+        <div class="login-success" id="forgotSuccess"></div>
+
+        <div class="form-group">
+          <label class="form-label">Email Address</label>
+          <input class="form-input" type="email" id="forgotEmail" placeholder="your@email.com" />
+        </div>
+
+        <button class="btn btn-primary btn-full btn-lg" id="forgotBtn" onclick="handleForgotPassword()">
+          Send Reset Link
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="js/main.js"></script>
+  <script type="module">
+    import { supabase } from './js/supabase.js';
+
+    // Capture return URL for post-login redirect (e.g. from WhatsApp/email deep links)
+    const urlParams = new URLSearchParams(window.location.search);
+    const returnUrl = urlParams.get('return');
+
+    window.showForgotPanel = function () {
+      document.getElementById('loginPanel').classList.add('hidden-panel');
+      document.getElementById('forgotPanel').classList.add('active');
+    };
+
+    window.showLoginPanel = function () {
+      document.getElementById('forgotPanel').classList.remove('active');
+      document.getElementById('loginPanel').classList.remove('hidden-panel');
+    };
+
+    window.handleLogin = async function () {
+      const identifier = document.getElementById('loginIdentifier').value.trim();
+      const password    = document.getElementById('loginPassword').value;
+      const errorBox     = document.getElementById('loginError');
+      const btn          = document.getElementById('loginBtn');
+
+      errorBox.classList.remove('show');
+
+      if (!identifier || !password) {
+        errorBox.textContent = 'Please enter both your email/phone and password.';
+        errorBox.classList.add('show');
+        return;
+      }
+
+      btn.textContent = 'Logging in...';
+      btn.disabled = true;
+
+      try {
+        // Determine if identifier is an email or a phone number,
+        // and resolve to the email used at signup (phone-based accounts
+        // are created with a synthetic @curaah.user email).
+        let email = identifier;
+        if (isValidPhone(identifier)) {
+          email = `${identifier}@curaah.user`;
+        }
+
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
+        if (error) {
+          throw new Error('Incorrect email/phone or password. Please try again.');
+        }
+
+        // Confirm a matching profile exists in public.users
+        const { data: profile, error: profileError } = await supabase
+          .from('users')
+          .select('id, full_name, onboarding_complete')
+          .eq('id', data.user.id)
+          .single();
+
+        if (profileError || !profile) {
+          await supabase.auth.signOut();
+          throw new Error('We could not find your Curaah profile. Please contact support.');
+        }
+
+        showToast(`Welcome back, ${profile.full_name?.split(' ')[0] || 'there'}!`, 'success');
+
+        setTimeout(() => {
+          if (returnUrl) {
+            window.location.href = decodeURIComponent(returnUrl);
+          } else {
+            window.location.href = 'dashboard.html';
+          }
+        }, 700);
+
+      } catch (err) {
+        btn.textContent = 'Login to Curaah';
+        btn.disabled = false;
+        errorBox.textContent = err.message;
+        errorBox.classList.add('show');
+      }
+    };
+
+    window.handleForgotPassword = async function () {
+      const email = document.getElementById('forgotEmail').value.trim();
+      const errorBox = document.getElementById('forgotError');
+      const successBox = document.getElementById('forgotSuccess');
+      const btn = document.getElementById('forgotBtn');
+
+      errorBox.classList.remove('show');
+      successBox.classList.remove('show');
+
+      if (!isValidEmail(email)) {
+        errorBox.textContent = 'Please enter a valid email address.';
+        errorBox.classList.add('show');
+        return;
+      }
+
+      btn.textContent = 'Sending...';
+      btn.disabled = true;
+
+      try {
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: `${window.location.origin}/login.html`,
+        });
+
+        if (error) throw new Error(error.message);
+
+        successBox.textContent = 'If an account exists with this email, a reset link has been sent. Please check your inbox.';
+        successBox.classList.add('show');
+        btn.textContent = 'Send Reset Link';
+        btn.disabled = false;
+
+      } catch (err) {
+        btn.textContent = 'Send Reset Link';
+        btn.disabled = false;
+        errorBox.textContent = err.message || 'Something went wrong. Please try again.';
+        errorBox.classList.add('show');
+      }
+    };
+
+    // If already logged in, skip straight to dashboard (or return URL)
+    (async function checkExistingSession() {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        window.location.href = returnUrl ? decodeURIComponent(returnUrl) : 'dashboard.html';
+      }
+    })();
+  </script>
+
+</body>
+</html>
