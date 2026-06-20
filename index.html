@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Curaah — Your AI Health & Adherence Companion</title>
+  <meta name="description" content="Curaah remembers your prescriptions, your medicines, your lab reports — so you and your family never have to carry that burden alone." />
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg" />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    body { background: var(--warm-white); }
+
+    /* ── HERO ── */
+    .hero {
+      background: var(--navy);
+      padding: calc(var(--nav-height) + 64px) 6% 90px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -120px; right: -120px;
+      width: 480px; height: 480px;
+      background: radial-gradient(circle, rgba(61,158,255,0.18), transparent 70%);
+      border-radius: 50%;
+    }
+    .hero::after {
+      content: '';
+      position: absolute;
+      bottom: -160px; left: -100px;
+      width: 420px; height: 420px;
+      background: radial-gradient(circle, rgba(0,212,170,0.12), transparent 70%);
+      border-radius: 50%;
+    }
+    .hero-inner {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 56px;
+      align-items: center;
+      position: relative;
+      z-index: 1;
+    }
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--electric);
+      background: rgba(61,158,255,0.1);
+      border: 1px solid rgba(61,158,255,0.25);
+      padding: 7px 16px;
+      border-radius: var(--radius-full);
+      margin-bottom: 22px;
+    }
+    .hero-title {
+      font-family: 'Georgia', serif;
+      font-size: clamp(34px, 4.4vw, 52px);
+      font-weight: 700;
+      color: var(--white);
+      line-height: 1.18;
+      margin-bottom: 20px;
+      letter-spacing: -0.5px;
+    }
+    .hero-title span { color: var(--electric); }
+    .hero-sub {
+      font-size: 17px;
+      color: var(--text-on-dark-muted);
+      line-height: 1.75;
+      max-width: 520px;
+      margin-bottom: 32px;
+    }
+    .hero-cta-row { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 28px; }
+    .hero-trust { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+    .hero-trust-item { display: flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--text-on-dark-muted); }
+
+    /* Hero visual — phone mockup feel */
+    .hero-visual {
+      background: var(--navy-mid);
+      border: 1px solid var(--border-dark);
+      border-radius: var(--radius-xl);
+      padding: 24px;
+      box-shadow: var(--shadow-lg);
+    }
+    .hero-visual-header { display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
+    .hero-visual-avatar {
+      width: 38px; height: 38px; border-radius: 50%;
+      background: rgba(61,158,255,0.15);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; color: var(--electric); font-weight: 700;
+    }
+    .hero-visual-name { font-size: 13px; font-weight: 600; color: var(--white); }
+    .hero-visual-sub { font-size: 11px; color: var(--text-on-dark-muted); }
+
+    .hero-chat-bubble {
+      background: rgba(255,255,255,0.06);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      font-size: 13px;
+      color: var(--text-on-dark-muted);
+      margin-bottom: 10px;
+      line-height: 1.6;
+    }
+    .hero-chat-bubble.ai {
+      background: rgba(61,158,255,0.12);
+      color: var(--white);
+      border-left: 3px solid var(--electric);
+    }
+
+    .hero-stat-strip { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 18px; }
+    .hero-stat { background: rgba(255,255,255,0.04); border-radius: var(--radius-md); padding: 12px; text-align: center; }
+    .hero-stat-num { font-family: 'Georgia', serif; font-size: 20px; font-weight: 700; color: var(--electric); }
+    .hero-stat-label { font-size: 10px; color: var(--text-on-dark-muted); margin-top: 2px; }
+
+    /* ── STORY SECTION ── */
+    .story-section { padding: 90px 6%; max-width: var(--max-width); margin: 0 auto; }
+    .section-tag {
+      font-size: 12px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+      color: var(--electric); margin-bottom: 14px; text-align: center;
+    }
+    .section-title {
+      font-family: 'Georgia', serif; font-size: clamp(26px, 3.2vw, 38px);
+      font-weight: 700; color: var(--text-primary); text-align: center;
+      margin-bottom: 14px; line-height: 1.25;
+    }
+    .section-sub {
+      font-size: 16px; color: var(--text-secondary); text-align: center;
+      max-width: 600px; margin: 0 auto 56px; line-height: 1.7;
+    }
+
+    .story-timeline { max-width: 720px; margin: 0 auto; }
+    .story-beat {
+      display: flex; gap: 18px; padding: 18px 0;
+      border-bottom: 1px solid var(--border-card);
+    }
+    .story-beat:last-child { border-bottom: none; }
+    .story-beat-icon {
+      width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0;
+      background: var(--off-white); display: flex; align-items: center; justify-content: center;
+      font-size: 19px; border: 1px solid var(--border-card);
+    }
+    .story-beat-text { font-size: 15px; color: var(--text-secondary); line-height: 1.7; padding-top: 7px; }
+    .story-beat.danger .story-beat-icon { background: rgba(255,71,87,0.08); border-color: rgba(255,71,87,0.2); }
+    .story-beat.danger .story-beat-text { color: var(--danger); font-weight: 600; }
+
+    .story-conclusion {
+      text-align: center; margin-top: 40px; padding: 28px;
+      background: var(--off-white); border-radius: var(--radius-lg);
+    }
+    .story-conclusion p {
+      font-family: 'Georgia', serif; font-size: 20px; font-weight: 700;
+      color: var(--text-primary); line-height: 1.5;
+    }
+    .story-conclusion p span { color: var(--electric); }
+
+    /* ── FEATURES GRID ── */
+    .features-section { padding: 90px 6%; background: var(--off-white); }
+    .features-inner { max-width: var(--max-width); margin: 0 auto; }
+    .features-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 50px;
+    }
+    .feature-card {
+      background: var(--white); border-radius: var(--radius-lg);
+      padding: 28px 24px; border: 1px solid var(--border-card);
+      transition: var(--transition);
+    }
+    .feature-card:hover { box-shadow: var(--shadow-md); transform: translateY(-3px); }
+    .feature-icon-box {
+      width: 52px; height: 52px; border-radius: var(--radius-md);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px; margin-bottom: 18px;
+    }
+    .feature-card h3 { font-size: 17px; margin-bottom: 10px; font-family: 'Inter'; font-weight: 700; }
+    .feature-card p { font-size: 13.5px; color: var(--text-secondary); line-height: 1.7; }
+
+    /* ── CHANNELS SECTION ── */
+    .channels-section { padding: 90px 6%; max-width: var(--max-width); margin: 0 auto; }
+    .channels-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 50px; }
+    .channel-card {
+      text-align: center; padding: 36px 24px;
+      background: var(--navy-mid); border-radius: var(--radius-lg);
+    }
+    .channel-icon { font-size: 40px; margin-bottom: 16px; }
+    .channel-card h3 { color: var(--white); font-size: 18px; margin-bottom: 10px; font-family: 'Inter'; }
+    .channel-card p { color: var(--text-on-dark-muted); font-size: 13.5px; line-height: 1.7; }
+
+    /* ── PRICING TEASER ── */
+    .pricing-section { padding: 90px 6%; background: var(--off-white); }
+    .pricing-inner { max-width: var(--max-width); margin: 0 auto; }
+    .pricing-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-top: 50px; }
+    .pricing-card {
+      background: var(--white); border: 1.5px solid var(--border-card);
+      border-radius: var(--radius-lg); padding: 28px 22px; text-align: center;
+      transition: var(--transition); position: relative;
+    }
+    .pricing-card.featured { border-color: var(--electric); box-shadow: var(--shadow-md); }
+    .pricing-card.featured::before {
+      content: 'MOST POPULAR'; position: absolute; top: -11px; left: 50%; transform: translateX(-50%);
+      background: var(--electric); color: white; font-size: 9px; font-weight: 700;
+      padding: 4px 12px; border-radius: var(--radius-full); letter-spacing: 0.5px;
+    }
+    .pricing-plan-name { font-size: 13px; font-weight: 700; color: var(--text-muted); margin-bottom: 12px; letter-spacing: 0.5px; }
+    .pricing-price { font-family: 'Georgia', serif; font-size: 32px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
+    .pricing-period { font-size: 12px; color: var(--text-muted); margin-bottom: 20px; }
+    .pricing-features { text-align: left; display: flex; flex-direction: column; gap: 10px; margin-bottom: 22px; }
+    .pricing-features li { font-size: 12.5px; color: var(--text-secondary); display: flex; gap: 7px; align-items: flex-start; }
+
+    /* ── CTA FINAL ── */
+    .cta-final {
+      background: var(--navy); padding: 80px 6%; text-align: center; position: relative; overflow: hidden;
+    }
+    .cta-final::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(circle at 50% 0%, rgba(61,158,255,0.15), transparent 60%);
+    }
+    .cta-final-inner { position: relative; z-index: 1; max-width: 640px; margin: 0 auto; }
+    .cta-final h2 { font-family: 'Georgia', serif; font-size: clamp(26px, 3.5vw, 38px); color: var(--white); margin-bottom: 16px; }
+    .cta-final p { font-size: 16px; color: var(--text-on-dark-muted); margin-bottom: 32px; line-height: 1.7; }
+
+    @media (max-width: 980px) {
+      .hero-inner { grid-template-columns: 1fr; }
+      .features-grid, .channels-grid { grid-template-columns: repeat(2, 1fr); }
+      .pricing-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 640px) {
+      .features-grid, .channels-grid, .pricing-grid { grid-template-columns: 1fr; }
+      .hero-stat-strip { grid-template-columns: 1fr 1fr 1fr; }
+      .story-beat { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <a href="index.html" class="nav-logo">
+      <svg class="nav-logo-icon" viewBox="0 0 36 36" fill="none">
+        <path d="M18 3 L5 9 L5 21 Q5 30 18 34 Q31 30 31 21 L31 9 Z" fill="#0f1f3d" stroke="#3d9eff" stroke-width="1.5"/>
+        <path d="M18 10 Q13 15 13 20 Q13 25 18 28 Q23 25 23 20 Q23 15 18 10Z" fill="#3d9eff" opacity="0.9"/>
+        <circle cx="18" cy="22" r="3.5" fill="white"/>
+      </svg>
+      <div class="nav-logo-text">
+        <span class="nav-logo-name">curaah</span>
+        <span class="nav-logo-tag">AI Health Companion</span>
+      </div>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#how-it-works">How It Works</a></li>
+      <li><a href="#pricing">Pricing</a></li>
+      <li><a href="#for-family">For Families</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="login.html" class="btn btn-ghost btn-sm">Login</a>
+      <a href="register.html" class="btn btn-primary btn-sm">Get Started Free</a>
+    </div>
+    <div class="nav-hamburger" id="hamburger" onclick="toggleMobileNav()"><span></span><span></span><span></span></div>
+  </nav>
+
+  <!-- ═══════════ HERO ═══════════ -->
+  <section class="hero">
+    <div class="hero-inner">
+      <div>
+        <div class="hero-tag">⚕️ Your Health, Remembered Daily</div>
+        <h1 class="hero-title">The companion that<br/>never forgets your <span>health</span>.</h1>
+        <p class="hero-sub">
+          Curaah remembers your prescriptions, checks your medicines, explains your lab reports,
+          and keeps your family informed — so managing health stops feeling like a burden you
+          carry alone.
+        </p>
+        <div class="hero-cta-row">
+          <a href="register.html" class="btn btn-primary btn-lg">Start Free — No Card Needed</a>
+          <a href="#how-it-works" class="btn btn-ghost btn-lg">See How It Works ↓</a>
+        </div>
+        <div class="hero-trust">
+          <div class="hero-trust-item">🔒 DPDP Act Compliant</div>
+          <div class="hero-trust-item">🗣️ Hindi · Punjabi · English</div>
+          <div class="hero-trust-item">👨‍⚕️ Pharmacist Verified</div>
+        </div>
+      </div>
+
+      <div class="hero-visual">
+        <div class="hero-visual-header">
+          <div class="hero-visual-avatar">RS</div>
+          <div>
+            <div class="hero-visual-name">Rajinder Singh's Companion</div>
+            <div class="hero-visual-sub">Type 2 Diabetes · 8 years</div>
+          </div>
+        </div>
+        <div class="hero-chat-bubble">"Kya main aaj Chinese khana kha sakta hoon?"</div>
+        <div class="hero-chat-bubble ai">
+          "Rajinder ji, aaj aapka blood pressure thoda high tha. Chinese food mein sodium zyada
+          hota hai — aaj ghar ka khana behtar rahega. 🙏"
+        </div>
+        <div class="hero-stat-strip">
+          <div class="hero-stat"><div class="hero-stat-num">86%</div><div class="hero-stat-label">Adherence</div></div>
+          <div class="hero-stat"><div class="hero-stat-num">72</div><div class="hero-stat-label">Recovery Score</div></div>
+          <div class="hero-stat"><div class="hero-stat-num">↑ Better</div><div class="hero-stat-label">This Week</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ THE STORY ═══════════ -->
+  <section class="story-section">
+    <div class="section-tag">The Problem</div>
+    <h2 class="section-title">Most patients aren't careless.<br/>They're unsupported.</h2>
+    <p class="section-sub">
+      A prescription is the last thing healthcare gives you — and the first thing you're
+      expected to manage entirely on your own.
+    </p>
+
+    <div class="story-timeline">
+      <div class="story-beat">
+        <div class="story-beat-icon">🏥</div>
+        <div class="story-beat-text">Doctor gives a new prescription. Four medicines. Complex timings.</div>
+      </div>
+      <div class="story-beat">
+        <div class="story-beat-icon">📋</div>
+        <div class="story-beat-text">Patient goes home. Paper slip in pocket. Tries to remember everything.</div>
+      </div>
+      <div class="story-beat">
+        <div class="story-beat-icon">💊</div>
+        <div class="story-beat-text">Day 3 — confuses two medicines. Takes the evening dose in the morning.</div>
+      </div>
+      <div class="story-beat">
+        <div class="story-beat-icon">👨‍👩‍👧</div>
+        <div class="story-beat-text">Daughter abroad calls every Sunday. She has no idea anything is wrong.</div>
+      </div>
+      <div class="story-beat danger">
+        <div class="story-beat-icon">🚨</div>
+        <div class="story-beat-text">Day 21 — preventable complication. Emergency room visit at 2 AM.</div>
+      </div>
+    </div>
+
+    <div class="story-conclusion">
+      <p>Curaah exists so that <span>this story never has to happen again.</span></p>
+    </div>
+  </section>
+
+  <!-- ═══════════ HOW IT WORKS / FEATURES ═══════════ -->
+  <section class="features-section" id="how-it-works">
+    <div class="features-inner">
+      <div class="section-tag">How Curaah Helps</div>
+      <h2 class="section-title">Not a reminder app.<br/>A companion that knows you.</h2>
+      <p class="section-sub">
+        Every feature works together — building a complete picture of your health, so you
+        never have to explain yourself from scratch again.
+      </p>
+
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon-box" style="background:rgba(61,158,255,0.1);">📸</div>
+          <h3>Prescription Intelligence</h3>
+          <p>Upload a photo of your prescription. AI extracts every medicine, dose, and timing — verified by a real pharmacist before it becomes your plan.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon-box" style="background:rgba(0,212,170,0.1);">📦</div>
+          <h3>Medicine Verification</h3>
+          <p>Point your camera at any strip or tablet — Curaah confirms it's the right one. Especially built for elderly users who confuse medicines.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon-box" style="background:rgba(255,159,0,0.1);">🤔</div>
+          <h3>Understands "Why"</h3>
+          <p>Skip a dose and Curaah doesn't just nag — it asks why, logs the real reason, and adapts your plan around your actual life.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon-box" style="background:rgba(255,71,87,0.1);">⚠️</div>
+          <h3>Drug Interaction Alerts</h3>
+          <p>Seeing multiple doctors? Curaah flags dangerous medicine combinations they might not know about — and tells you to check.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon-box" style="background:rgba(61,158,255,0.1);">📊</div>
+          <h3>Lab Reports, Explained</h3>
+          <p>Upload any test report. Curaah explains every value in plain Hindi or Punjabi, and shows your progress over time — not just numbers.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon-box" style="background:rgba(0,212,170,0.1);">👨‍👩‍👧</div>
+          <h3>Family Dashboard</h3>
+          <p>With your consent, family — even abroad — can see if medicine was taken, track progress, and get alerts. Real peace of mind.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ CHANNELS ═══════════ -->
+  <section class="channels-section">
+    <div class="section-tag">Built For Everyone</div>
+    <h2 class="section-title">Works however you're comfortable.</h2>
+    <p class="section-sub">
+      Technology should work even for people who aren't comfortable with technology.
+    </p>
+
+    <div class="channels-grid">
+      <div class="channel-card">
+        <div class="channel-icon">📱</div>
+        <h3>App & Website</h3>
+        <p>Full dashboard, complete history, and detailed tracking — for tech-comfortable users.</p>
+      </div>
+      <div class="channel-card">
+        <div class="channel-icon">💬</div>
+        <h3>WhatsApp</h3>
+        <p>Just chat. Send a photo of a medicine strip or ask a question — no app download needed.</p>
+      </div>
+      <div class="channel-card">
+        <div class="channel-icon">📞</div>
+        <h3>AI Voice Call</h3>
+        <p>Register once on our website — Curaah's AI can call to check in and guide you by voice.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ PRICING TEASER ═══════════ -->
+  <section class="pricing-section" id="pricing">
+    <div class="pricing-inner">
+      <div class="section-tag">Simple Pricing</div>
+      <h2 class="section-title">Free for the basics. Affordable for everything else.</h2>
+      <p class="section-sub">Cancel anytime. No hidden charges. Built to be affordable for every Indian family.</p>
+
+      <div class="pricing-grid">
+        <div class="pricing-card">
+          <div class="pricing-plan-name">FREE FOREVER</div>
+          <div class="pricing-price">₹0</div>
+          <div class="pricing-period">always free</div>
+          <ul class="pricing-features">
+            <li>✓ Basic medicine reminders</li>
+            <li>✓ 3 lab reports explained / month</li>
+            <li>✓ 5 AI questions / day</li>
+            <li>✓ Basic adherence log</li>
+          </ul>
+          <a href="register.html" class="btn btn-secondary btn-full btn-sm">Start Free</a>
+        </div>
+
+        <div class="pricing-card featured">
+          <div class="pricing-plan-name">CURAAH CARE</div>
+          <div class="pricing-price">₹99</div>
+          <div class="pricing-period">per month</div>
+          <ul class="pricing-features">
+            <li>✓ Unlimited AI companion</li>
+            <li>✓ Full adherence tracking</li>
+            <li>✓ Family dashboard (1 member)</li>
+            <li>✓ Medicine photo verification</li>
+            <li>✓ Weekly WhatsApp summary</li>
+          </ul>
+          <a href="register.html" class="btn btn-primary btn-full btn-sm">Get Curaah Care</a>
+        </div>
+
+        <div class="pricing-card">
+          <div class="pricing-plan-name">CURAAH FAMILY</div>
+          <div class="pricing-price">₹199</div>
+          <div class="pricing-period">per month</div>
+          <ul class="pricing-features">
+            <li>✓ Everything in Care</li>
+            <li>✓ 3 family dashboard members</li>
+            <li>✓ SOS emergency alerts</li>
+            <li>✓ Priority pharmacist check</li>
+          </ul>
+          <a href="register.html" class="btn btn-secondary btn-full btn-sm">Choose Family</a>
+        </div>
+
+        <div class="pricing-card">
+          <div class="pricing-plan-name">CURAAH NRI</div>
+          <div class="pricing-price">$9</div>
+          <div class="pricing-period">per month</div>
+          <ul class="pricing-features">
+            <li>✓ Everything in Family</li>
+            <li>✓ Daily WhatsApp update abroad</li>
+            <li>✓ Bilingual dashboard</li>
+            <li>✓ International SOS alert</li>
+          </ul>
+          <a href="register.html" class="btn btn-secondary btn-full btn-sm">For NRI Families</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════ FINAL CTA ═══════════ -->
+  <section class="cta-final">
+    <div class="cta-final-inner">
+      <h2>Nobody should manage their health alone.</h2>
+      <p>Join Curaah today — free, in your language, from your phone or WhatsApp.</p>
+      <a href="register.html" class="btn btn-primary btn-lg">Start Your Free Companion →</a>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand-name">
+          <svg width="26" height="26" viewBox="0 0 36 36" fill="none">
+            <path d="M18 3 L5 9 L5 21 Q5 30 18 34 Q31 30 31 21 L31 9 Z" fill="#0f1f3d" stroke="#3d9eff" stroke-width="1.5"/>
+            <path d="M18 10 Q13 15 13 20 Q13 25 18 28 Q23 25 23 20 Q23 15 18 10Z" fill="#3d9eff" opacity="0.9"/>
+            <circle cx="18" cy="22" r="3.5" fill="white"/>
+          </svg>curaah
+        </div>
+        <p class="footer-brand-desc">Your health, remembered. An AI companion that supports you between every doctor visit.</p>
+        <p class="footer-built">A product of <span>Curaah HealthTech Pvt Ltd</span> · Nangal, Punjab 🇮🇳</p>
+      </div>
+      <div>
+        <div class="footer-col-title">Product</div>
+        <ul class="footer-col-links">
+          <li><a href="#how-it-works">How It Works</a></li>
+          <li><a href="#pricing">Pricing</a></li>
+          <li><a href="register.html">Get Started</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">Legal</div>
+        <ul class="footer-col-links">
+          <li><a href="privacy.html">Privacy Policy</a></li>
+          <li><a href="terms.html">Terms of Service</a></li>
+          <li><a href="consent.html">Manage Consent</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">Contact</div>
+        <ul class="footer-col-links">
+          <li><a href="mailto:curaahtech@gmail.com">curaahtech@gmail.com</a></li>
+          <li><a href="#">Nangal, Punjab 140124</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-bottom-text">© 2026 Curaah HealthTech Pvt Ltd. All rights reserved.</p>
+      <div class="footer-bottom-links">
+        <a href="privacy.html">Privacy</a>
+        <a href="terms.html">Terms</a>
+        <a href="delete-account.html">Delete My Data</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+  <script>
+    function toggleMobileNav() {
+      // Simple placeholder — full mobile nav drawer can be added later
+      showToast('Menu — full mobile navigation coming soon', 'info', 2000);
+    }
+  </script>
+
+</body>
+</html>
