@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Recovery Score — Curaah</title>
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg" />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    body { background: var(--off-white); min-height: 100vh; }
+    .dashboard-layout { display: flex; min-height: 100vh; padding-top: var(--nav-height); }
+
+    .sidebar {
+      width: 252px; flex-shrink: 0; background: var(--navy);
+      border-right: 1px solid var(--border-dark);
+      position: fixed; top: var(--nav-height); left: 0; bottom: 0;
+      display: flex; flex-direction: column; overflow-y: auto; z-index: 90;
+    }
+    .sidebar-profile { padding: 22px 18px; border-bottom: 1px solid var(--border-dark); display: flex; align-items: center; gap: 12px; }
+    .sidebar-avatar {
+      width: 42px; height: 42px; border-radius: 50%;
+      background: rgba(61,158,255,0.15); border: 2px solid var(--electric);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; font-weight: 700; color: var(--electric); flex-shrink: 0;
+    }
+    .sidebar-profile-name { font-size: 14px; font-weight: 600; color: var(--white); margin-bottom: 2px; }
+    .sidebar-profile-tag  { font-size: 11px; color: var(--text-on-dark-muted); }
+    .sidebar-nav { padding: 14px 10px; flex: 1; display: flex; flex-direction: column; gap: 2px; }
+    .sidebar-section-label { font-size: 10px; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase; color: rgba(255,255,255,0.25); padding: 12px 8px 6px; }
+    .sidebar-item {
+      display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+      border-radius: var(--radius-md); font-size: 13.5px; font-weight: 500;
+      color: var(--text-on-dark-muted); cursor: pointer; transition: var(--transition);
+      border: none; background: none; width: 100%; text-align: left; text-decoration: none;
+    }
+    .sidebar-item:hover  { background: rgba(255,255,255,0.06); color: var(--white); }
+    .sidebar-item.active { background: rgba(61,158,255,0.12); color: var(--electric); font-weight: 600; }
+    .sidebar-item-icon   { font-size: 16px; width: 20px; text-align: center; flex-shrink: 0; }
+    .sidebar-sos-box { margin: 12px 10px; padding: 14px; background: rgba(255,71,87,0.1); border: 1px solid rgba(255,71,87,0.25); border-radius: var(--radius-md); text-align: center; }
+    .sidebar-sos-box button { width: 100%; background: var(--danger); color: white; font-weight: 700; font-size: 13px; padding: 10px; border-radius: var(--radius-md); }
+    .sidebar-bottom { padding: 14px 10px; border-top: 1px solid var(--border-dark); }
+
+    .dashboard-main { margin-left: 252px; flex: 1; padding: 30px 36px 60px; }
+    .dash-header { margin-bottom: 22px; }
+    .dash-greeting { font-size: 13px; color: var(--text-muted); margin-bottom: 4px; }
+    .dash-title    { font-family: 'Georgia', serif; font-size: 25px; font-weight: 700; color: var(--text-primary); }
+
+    /* ── HERO SCORE ── */
+    .score-hero {
+      background: var(--navy); border-radius: var(--radius-xl); padding: 36px;
+      display: grid; grid-template-columns: 220px 1fr; gap: 32px; align-items: center;
+      margin-bottom: 24px; position: relative; overflow: hidden;
+    }
+    .score-hero::before {
+      content: ''; position: absolute; top: -80px; right: -80px; width: 260px; height: 260px;
+      background: radial-gradient(circle, rgba(61,158,255,0.18), transparent 70%); border-radius: 50%;
+    }
+    .score-ring-wrap-big { position: relative; z-index: 1; }
+    .score-num-big { font-family: 'Georgia', serif; font-size: 48px; font-weight: 700; fill: var(--white); }
+    .score-label-big { font-size: 10px; fill: var(--text-on-dark-muted); letter-spacing: 0.5px; }
+
+    .score-hero-right { position: relative; z-index: 1; }
+    .score-status-tag-big { display: inline-block; font-size: 13px; font-weight: 700; padding: 6px 16px; border-radius: var(--radius-full); margin-bottom: 12px; }
+    .score-hero-desc { font-size: 14px; color: var(--text-on-dark-muted); line-height: 1.7; max-width: 460px; }
+    .streak-badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(255,159,0,0.12); border: 1px solid rgba(255,159,0,0.3); color: var(--warning); font-size: 12.5px; font-weight: 700; padding: 6px 14px; border-radius: var(--radius-full); margin-top: 12px; }
+
+    /* ── BREAKDOWN CARDS ── */
+    .breakdown-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+    .breakdown-card { background: var(--white); border: 1px solid var(--border-card); border-radius: var(--radius-lg); padding: 18px; }
+    .breakdown-card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+    .breakdown-card-icon { font-size: 22px; }
+    .breakdown-card-weight { font-size: 10px; color: var(--text-muted); font-weight: 600; }
+    .breakdown-card-label { font-size: 12px; color: var(--text-muted); margin-bottom: 4px; }
+    .breakdown-card-value { font-family: 'Georgia', serif; font-size: 26px; font-weight: 700; }
+    .breakdown-bar-track { height: 6px; background: var(--off-white); border-radius: var(--radius-full); margin-top: 10px; overflow: hidden; }
+    .breakdown-bar-fill { height: 100%; border-radius: var(--radius-full); transition: width 0.8s ease; }
+
+    /* ── TREND CHART ── */
+    .panel { background: var(--white); border: 1px solid var(--border-card); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 20px; }
+    .panel-header { padding: 17px 20px; border-bottom: 1px solid var(--border-card); display: flex; align-items: center; justify-content: space-between; }
+    .panel-title { font-size: 14.5px; font-weight: 700; color: var(--text-primary); }
+    .panel-body { padding: 20px; }
+    .panel-empty { padding: 40px 20px; text-align: center; color: var(--text-muted); font-size: 13.5px; }
+
+    .chart-wrap { width: 100%; overflow-x: auto; }
+    .trend-bars { display: flex; align-items: flex-end; gap: 6px; height: 160px; min-width: 100%; padding-top: 10px; }
+    .trend-bar-col { flex: 1; min-width: 18px; display: flex; flex-direction: column; align-items: center; gap: 6px; height: 100%; justify-content: flex-end; }
+    .trend-bar { width: 100%; border-radius: 4px 4px 0 0; min-height: 4px; transition: var(--transition); }
+    .trend-bar-label { font-size: 9px; color: var(--text-muted); white-space: nowrap; }
+
+    /* ── INSIGHTS LIST ── */
+    .insight-row { display: flex; align-items: flex-start; gap: 12px; padding: 14px 20px; border-bottom: 1px solid var(--border-card); }
+    .insight-row:last-child { border-bottom: none; }
+    .insight-icon { font-size: 18px; flex-shrink: 0; }
+    .insight-text { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
+
+    @media (max-width: 1000px) {
+      .breakdown-grid { grid-template-columns: repeat(2, 1fr); }
+      .score-hero { grid-template-columns: 1fr; text-align: center; }
+      .score-hero-right { display: flex; flex-direction: column; align-items: center; }
+    }
+    @media (max-width: 860px) {
+      .sidebar { transform: translateX(-252px); transition: transform 0.3s; }
+      .sidebar.open { transform: translateX(0); }
+      .dashboard-main { margin-left: 0; padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <a href="index.html" class="nav-logo">
+      <svg class="nav-logo-icon" viewBox="0 0 36 36" fill="none">
+        <path d="M18 3 L5 9 L5 21 Q5 30 18 34 Q31 30 31 21 L31 9 Z" fill="#0f1f3d" stroke="#3d9eff" stroke-width="1.5"/>
+        <path d="M18 10 Q13 15 13 20 Q13 25 18 28 Q23 25 23 20 Q23 15 18 10Z" fill="#3d9eff" opacity="0.9"/>
+        <circle cx="18" cy="22" r="3.5" fill="white"/>
+      </svg>
+      <div class="nav-logo-text"><span class="nav-logo-name">curaah</span><span class="nav-logo-tag">AI Health Companion</span></div>
+    </a>
+    <ul class="nav-links"><li><a href="ai-companion.html">Ask AI</a></li></ul>
+    <div class="nav-actions">
+      <span style="font-size:13px;color:var(--text-on-dark-muted);">Hi, <strong style="color:var(--white);" id="navName">—</strong></span>
+      <button class="btn btn-ghost btn-sm" onclick="handleLogout()">Logout</button>
+    </div>
+    <div class="nav-hamburger" id="hamburger" onclick="toggleSidebar()"><span></span><span></span><span></span></div>
+  </nav>
+
+  <div class="dashboard-layout">
+
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-profile">
+        <div class="sidebar-avatar" id="sidebarAvatar">—</div>
+        <div><div class="sidebar-profile-name" id="sidebarName">Loading...</div><div class="sidebar-profile-tag" id="sidebarCity">—</div></div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="sidebar-section-label">Main</div>
+        <a class="sidebar-item" href="dashboard.html"><span class="sidebar-item-icon">🏠</span> Dashboard</a>
+        <a class="sidebar-item" href="prescriptions.html"><span class="sidebar-item-icon">📋</span> Prescriptions</a>
+        <a class="sidebar-item" href="medicines.html"><span class="sidebar-item-icon">💊</span> My Medicines</a>
+        <a class="sidebar-item" href="adherence.html"><span class="sidebar-item-icon">📅</span> Adherence Log</a>
+        <a class="sidebar-item" href="lab-reports.html"><span class="sidebar-item-icon">📊</span> Lab Reports</a>
+        <a class="sidebar-item" href="ai-companion.html"><span class="sidebar-item-icon">🤖</span> AI Companion</a>
+        <div class="sidebar-section-label">Family & Safety</div>
+        <a class="sidebar-item" href="family.html"><span class="sidebar-item-icon">👨‍👩‍👧</span> Family Dashboard</a>
+        <a class="sidebar-item active" href="recovery-score.html"><span class="sidebar-item-icon">📈</span> Recovery Score</a>
+        <div class="sidebar-section-label">Account</div>
+        <a class="sidebar-item" href="consent.html"><span class="sidebar-item-icon">🔒</span> Privacy & Consent</a>
+        <a class="sidebar-item" href="profile.html"><span class="sidebar-item-icon">👤</span> My Profile</a>
+      </nav>
+      <div class="sidebar-sos-box">
+        <div style="font-size:11px;color:var(--text-on-dark-muted);margin-bottom:8px;">In an emergency</div>
+        <button onclick="window.location.href='sos.html'">🚨 SOS</button>
+      </div>
+      <div class="sidebar-bottom">
+        <button class="sidebar-item" onclick="handleLogout()" style="color:var(--danger);"><span class="sidebar-item-icon">🚪</span> Logout</button>
+      </div>
+    </aside>
+
+    <main class="dashboard-main">
+
+      <div class="dash-header">
+        <div class="dash-greeting">A simple way to see how you're doing</div>
+        <div class="dash-title">Recovery Score</div>
+      </div>
+
+      <!-- Hero score -->
+      <div class="score-hero">
+        <div class="score-ring-wrap-big">
+          <svg width="200" height="200" viewBox="0 0 200 200">
+            <circle cx="100" cy="100" r="84" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="16" />
+            <circle id="scoreRingBig" cx="100" cy="100" r="84" fill="none" stroke="#3d9eff" stroke-width="16"
+              stroke-linecap="round" stroke-dasharray="528" stroke-dashoffset="528"
+              transform="rotate(-90 100 100)" style="transition: stroke-dashoffset 1.2s ease, stroke 0.3s;" />
+            <text x="100" y="96" text-anchor="middle" class="score-num-big" id="scoreNumBig">—</text>
+            <text x="100" y="118" text-anchor="middle" class="score-label-big">OUT OF 100</text>
+          </svg>
+        </div>
+        <div class="score-hero-right">
+          <span class="score-status-tag-big" id="scoreStatusTagBig">Loading...</span>
+          <p class="score-hero-desc" id="scoreHeroDesc">Calculating your recovery score based on the last 7 days of activity.</p>
+          <div class="streak-badge" id="streakBadge" style="display:none;">🔥 <span id="streakDays">0</span>-day streak</div>
+        </div>
+      </div>
+
+      <!-- Breakdown cards -->
+      <div class="breakdown-grid">
+        <div class="breakdown-card">
+          <div class="breakdown-card-top">
+            <span class="breakdown-card-icon">💊</span>
+            <span class="breakdown-card-weight">40% weight</span>
+          </div>
+          <div class="breakdown-card-label">Medicine Adherence</div>
+          <div class="breakdown-card-value" id="adherenceVal" style="color:var(--electric);">—</div>
+          <div class="breakdown-bar-track"><div class="breakdown-bar-fill" id="adherenceBar" style="background:var(--electric);width:0%;"></div></div>
+        </div>
+        <div class="breakdown-card">
+          <div class="breakdown-card-top">
+            <span class="breakdown-card-icon">📊</span>
+            <span class="breakdown-card-weight">25% weight</span>
+          </div>
+          <div class="breakdown-card-label">Lab Report Trend</div>
+          <div class="breakdown-card-value" id="labVal" style="color:var(--success);">—</div>
+          <div class="breakdown-bar-track"><div class="breakdown-bar-fill" id="labBar" style="background:var(--success);width:0%;"></div></div>
+        </div>
+        <div class="breakdown-card">
+          <div class="breakdown-card-top">
+            <span class="breakdown-card-icon">🧘</span>
+            <span class="breakdown-card-weight">20% weight</span>
+          </div>
+          <div class="breakdown-card-label">Lifestyle (Food + Exercise)</div>
+          <div class="breakdown-card-value" id="lifestyleVal" style="color:var(--teal);">—</div>
+          <div class="breakdown-bar-track"><div class="breakdown-bar-fill" id="lifestyleBar" style="background:var(--teal);width:0%;"></div></div>
+        </div>
+        <div class="breakdown-card">
+          <div class="breakdown-card-top">
+            <span class="breakdown-card-icon">⚡</span>
+            <span class="breakdown-card-weight">15% weight</span>
+          </div>
+          <div class="breakdown-card-label">Engagement</div>
+          <div class="breakdown-card-value" id="engagementVal" style="color:var(--warning);">—</div>
+          <div class="breakdown-bar-track"><div class="breakdown-bar-fill" id="engagementBar" style="background:var(--warning);width:0%;"></div></div>
+        </div>
+      </div>
+
+      <!-- Trend chart -->
+      <div class="panel">
+        <div class="panel-header"><div class="panel-title">📈 Last 14 Days</div></div>
+        <div class="panel-body">
+          <div class="chart-wrap">
+            <div class="trend-bars" id="trendBars">
+              <div class="panel-empty">Loading trend...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Insights -->
+      <div class="panel">
+        <div class="panel-header"><div class="panel-title">💡 What This Means</div></div>
+        <div id="insightsList">
+          <div class="panel-empty">Loading insights...</div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script src="js/main.js"></script>
+  <script type="module">
+    import { supabase, requireAuth, signOutUser } from './js/supabase.js';
+
+    let currentUser = null;
+    const TODAY = getTodayLocal();
+
+    async function init() {
+      const session = await requireAuth('login.html');
+      if (!session) return;
+
+      const { data: profile } = await supabase.from('users').select('*').eq('id', session.user.id).single();
+      if (!profile) return;
+
+      currentUser = profile;
+      document.getElementById('navName').textContent       = (profile.full_name || '').split(' ')[0] || '—';
+      document.getElementById('sidebarName').textContent   = profile.full_name || '—';
+      document.getElementById('sidebarAvatar').textContent = getInitials(profile.full_name);
+      document.getElementById('sidebarCity').textContent   = profile.city || 'India';
+
+      await ensureTodayScore();
+      await loadTodayBreakdown();
+      await loadTrend();
+    }
+
+    async function ensureTodayScore() {
+      try {
+        await supabase.rpc('calculate_recovery_score', { p_user_id: currentUser.id, p_date: TODAY });
+      } catch (_) { /* fall back to reading existing row below */ }
+    }
+
+    async function loadTodayBreakdown() {
+      const { data: score } = await supabase
+        .from('recovery_scores')
+        .select('*')
+        .eq('user_id', currentUser.id)
+        .eq('score_date', TODAY)
+        .single();
+
+      const overall = score?.overall_score ?? 0;
+      const circumference = 528; // 2 * PI * 84
+      const offset = circumference - (circumference * Math.min(overall, 100) / 100);
+      const color = scoreColor(overall);
+
+      const ring = document.getElementById('scoreRingBig');
+      ring.style.strokeDashoffset = offset;
+      ring.style.stroke = color;
+      document.getElementById('scoreNumBig').textContent = score ? Math.round(overall) : '—';
+
+      const tag = document.getElementById('scoreStatusTagBig');
+      tag.textContent = score ? scoreLabel(overall) : 'Not enough data yet';
+      tag.style.color = color;
+      tag.style.background = color + '26';
+
+      const descMap = {
+        excellent: "You're doing really well. Keep this rhythm going — your body is responding to the consistency.",
+        good: "Good progress overall. A small push in one or two areas below could take you to excellent.",
+        attention: "A few things need attention. Look at the breakdown below to see exactly where.",
+        risk: "Your score suggests some real gaps right now. This is exactly when Curaah is most useful — let's work through it together.",
+      };
+      const heroDesc = document.getElementById('scoreHeroDesc');
+      if (!score) heroDesc.textContent = "Once you start logging your medicines, food, and exercise, your Recovery Score will appear here.";
+      else if (overall >= 75) heroDesc.textContent = descMap.excellent;
+      else if (overall >= 50) heroDesc.textContent = descMap.good;
+      else if (overall >= 30) heroDesc.textContent = descMap.attention;
+      else heroDesc.textContent = descMap.risk;
+
+      if (score?.adherence_streak_days > 0) {
+        document.getElementById('streakBadge').style.display = 'inline-flex';
+        document.getElementById('streakDays').textContent = score.adherence_streak_days;
+      }
+
+      // Breakdown cards
+      setBreakdown('adherence', score?.adherence_score, '%', 'Doses taken on time (last 7 days)');
+      setBreakdown('lab', score?.lab_score, '%', score ? null : null);
+      setBreakdown('lifestyle', score?.lifestyle_score, '%', 'Food & exercise logs (last 7 days)');
+      setBreakdown('engagement', score?.engagement_score, '%', 'Using Curaah & asking questions');
+
+      // Insights
+      renderInsights(score);
+    }
+
+    function setBreakdown(key, value, unit, _unused) {
+      const v = value != null ? Math.round(value) : 0;
+      document.getElementById(key + 'Val').textContent = value != null ? `${v}${unit}` : '—';
+      document.getElementById(key + 'Bar').style.width = `${Math.min(v, 100)}%`;
+    }
+
+    function renderInsights(score) {
+      const el = document.getElementById('insightsList');
+      if (!score) {
+        el.innerHTML = `<div class="panel-empty">Start logging your medicines and daily activity to see personalised insights here.</div>`;
+        return;
+      }
+
+      const insights = [];
+      const bd = score.breakdown || {};
+
+      if (score.adherence_score >= 85) {
+        insights.push({ icon: '✅', text: `Excellent medicine adherence this week — ${bd.adherence_taken || 0} of ${bd.adherence_scheduled || 0} doses taken on schedule.` });
+      } else if (score.adherence_score < 60) {
+        insights.push({ icon: '⚠️', text: `Adherence dropped this week — only ${bd.adherence_taken || 0} of ${bd.adherence_scheduled || 0} scheduled doses were taken. Check your Adherence Log to see what's getting in the way.` });
+      }
+
+      if (score.adherence_streak_days >= 7) {
+        insights.push({ icon: '🔥', text: `You're on a ${score.adherence_streak_days}-day perfect adherence streak. This consistency is what drives real recovery.` });
+      }
+
+      if (score.lifestyle_score < 40) {
+        insights.push({ icon: '🥗', text: `Food and exercise logging has been light this week (${bd.food_logs_7d || 0} food logs, ${bd.exercise_logs_7d || 0} exercise logs). Even small daily logs help Curaah support you better.` });
+      }
+
+      if (score.engagement_score < 50) {
+        insights.push({ icon: '🤖', text: `You haven't asked the AI Companion many questions lately. Feel free to ask anything — it already knows your history.` });
+      }
+
+      if (!insights.length) {
+        insights.push({ icon: '👍', text: 'Everything looks balanced this week. Keep going at this pace.' });
+      }
+
+      el.innerHTML = insights.map(i => `
+        <div class="insight-row">
+          <span class="insight-icon">${i.icon}</span>
+          <span class="insight-text">${i.text}</span>
+        </div>`).join('');
+    }
+
+    async function loadTrend() {
+      const startDate = new Date();
+      startDate.setDate(startDate.getDate() - 13);
+      const startStr = startDate.toLocaleDateString('en-CA');
+
+      const { data } = await supabase
+        .from('recovery_scores')
+        .select('score_date, overall_score')
+        .eq('user_id', currentUser.id)
+        .gte('score_date', startStr)
+        .order('score_date', { ascending: true });
+
+      const el = document.getElementById('trendBars');
+
+      // Build a full 14-day map, filling gaps with null
+      const days = [];
+      for (let i = 13; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        days.push(d.toLocaleDateString('en-CA'));
+      }
+
+      const scoreMap = {};
+      (data || []).forEach(r => { scoreMap[r.score_date] = r.overall_score; });
+
+      if (!data || data.every(r => r.overall_score == null)) {
+        el.innerHTML = `<div class="panel-empty">No score history yet — check back after a few days of activity.</div>`;
+        return;
+      }
+
+      el.innerHTML = days.map(d => {
+        const val = scoreMap[d];
+        const heightPct = val != null ? Math.max(val, 4) : 3;
+        const color = val != null ? scoreColor(val) : '#e4eaf2';
+        const dateObj = new Date(d + 'T00:00:00');
+        const label = dateObj.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+
+        return `
+          <div class="trend-bar-col">
+            <div class="trend-bar" style="height:${heightPct}%;background:${color};" title="${val != null ? Math.round(val) : 'No data'}"></div>
+            <div class="trend-bar-label">${label.split(' ')[0]}</div>
+          </div>`;
+      }).join('');
+    }
+
+    window.handleLogout = async function () {
+      await signOutUser();
+      showToast('Logged out.', 'success');
+      setTimeout(() => { window.location.href = 'index.html'; }, 600);
+    };
+
+    init();
+  </script>
+
+</body>
+</html>
