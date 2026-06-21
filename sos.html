@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SOS — Curaah</title>
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg" />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    body { background: var(--off-white); min-height: 100vh; }
+    .dashboard-layout { display: flex; min-height: 100vh; padding-top: var(--nav-height); }
+
+    .sidebar {
+      width: 252px; flex-shrink: 0; background: var(--navy);
+      border-right: 1px solid var(--border-dark);
+      position: fixed; top: var(--nav-height); left: 0; bottom: 0;
+      display: flex; flex-direction: column; overflow-y: auto; z-index: 90;
+    }
+    .sidebar-profile { padding: 22px 18px; border-bottom: 1px solid var(--border-dark); display: flex; align-items: center; gap: 12px; }
+    .sidebar-avatar {
+      width: 42px; height: 42px; border-radius: 50%;
+      background: rgba(61,158,255,0.15); border: 2px solid var(--electric);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; font-weight: 700; color: var(--electric); flex-shrink: 0;
+    }
+    .sidebar-profile-name { font-size: 14px; font-weight: 600; color: var(--white); margin-bottom: 2px; }
+    .sidebar-profile-tag  { font-size: 11px; color: var(--text-on-dark-muted); }
+    .sidebar-nav { padding: 14px 10px; flex: 1; display: flex; flex-direction: column; gap: 2px; }
+    .sidebar-section-label { font-size: 10px; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase; color: rgba(255,255,255,0.25); padding: 12px 8px 6px; }
+    .sidebar-item {
+      display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+      border-radius: var(--radius-md); font-size: 13.5px; font-weight: 500;
+      color: var(--text-on-dark-muted); cursor: pointer; transition: var(--transition);
+      border: none; background: none; width: 100%; text-align: left; text-decoration: none;
+    }
+    .sidebar-item:hover  { background: rgba(255,255,255,0.06); color: var(--white); }
+    .sidebar-item.active { background: rgba(61,158,255,0.12); color: var(--electric); font-weight: 600; }
+    .sidebar-item-icon   { font-size: 16px; width: 20px; text-align: center; flex-shrink: 0; }
+    .sidebar-bottom { padding: 14px 10px; border-top: 1px solid var(--border-dark); }
+
+    .dashboard-main { margin-left: 252px; flex: 1; padding: 30px 36px 60px; }
+    .dash-header { margin-bottom: 22px; }
+    .dash-greeting { font-size: 13px; color: var(--text-muted); margin-bottom: 4px; }
+    .dash-title    { font-family: 'Georgia', serif; font-size: 25px; font-weight: 700; color: var(--text-primary); }
+
+    /* ── BIG SOS BUTTON ── */
+    .sos-hero {
+      background: var(--navy); border-radius: var(--radius-xl); padding: 44px 24px;
+      text-align: center; margin-bottom: 24px; position: relative; overflow: hidden;
+    }
+    .sos-hero::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(circle at 50% 30%, rgba(255,71,87,0.18), transparent 65%);
+    }
+    .sos-button {
+      position: relative; z-index: 1;
+      width: 180px; height: 180px; border-radius: 50%;
+      background: var(--danger); color: white;
+      font-size: 22px; font-weight: 800; letter-spacing: 1px;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      margin: 0 auto 22px; cursor: pointer; border: none;
+      box-shadow: 0 0 0 0 rgba(255,71,87,0.5);
+      animation: sosPulse 2.2s infinite;
+      transition: transform 0.15s;
+    }
+    .sos-button:active { transform: scale(0.96); }
+    .sos-button-icon { font-size: 38px; margin-bottom: 4px; }
+    @keyframes sosPulse {
+      0%   { box-shadow: 0 0 0 0 rgba(255,71,87,0.45); }
+      70%  { box-shadow: 0 0 0 22px rgba(255,71,87,0); }
+      100% { box-shadow: 0 0 0 0 rgba(255,71,87,0); }
+    }
+    .sos-hero-desc { position: relative; z-index: 1; font-size: 13.5px; color: var(--text-on-dark-muted); max-width: 380px; margin: 0 auto; line-height: 1.7; }
+
+    /* ── COUNTDOWN STATE ── */
+    .sos-countdown { display: none; position: relative; z-index: 1; }
+    .sos-countdown.show { display: block; }
+    .sos-countdown-num { font-family: 'Georgia', serif; font-size: 64px; font-weight: 700; color: var(--white); margin-bottom: 10px; }
+    .sos-countdown-text { font-size: 14px; color: var(--text-on-dark-muted); margin-bottom: 18px; }
+
+    /* ── TRIGGERED STATE ── */
+    .sos-triggered { display: none; position: relative; z-index: 1; }
+    .sos-triggered.show { display: block; }
+    .sos-triggered-icon { font-size: 56px; margin-bottom: 14px; }
+    .sos-triggered-title { font-size: 20px; font-weight: 700; color: var(--white); margin-bottom: 8px; }
+    .sos-triggered-list { display: flex; flex-direction: column; gap: 8px; max-width: 320px; margin: 18px auto 0; text-align: left; }
+    .sos-triggered-item { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.08); border-radius: var(--radius-md); padding: 10px 14px; font-size: 12.5px; color: var(--text-on-dark-muted); }
+
+    /* ── CONTACTS PANEL ── */
+    .panel { background: var(--white); border: 1px solid var(--border-card); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 20px; }
+    .panel-header { padding: 17px 20px; border-bottom: 1px solid var(--border-card); display: flex; align-items: center; justify-content: space-between; }
+    .panel-title { font-size: 14.5px; font-weight: 700; color: var(--text-primary); }
+    .panel-empty { padding: 36px 20px; text-align: center; color: var(--text-muted); font-size: 13.5px; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+
+    .contact-row { display: flex; align-items: center; gap: 14px; padding: 14px 20px; border-bottom: 1px solid var(--border-card); }
+    .contact-row:last-child { border-bottom: none; }
+    .contact-avatar { width: 38px; height: 38px; border-radius: 50%; background: rgba(255,71,87,0.08); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: var(--danger); flex-shrink: 0; }
+    .contact-info { flex: 1; min-width: 0; }
+    .contact-name { font-size: 13.5px; font-weight: 600; color: var(--text-primary); }
+    .contact-meta { font-size: 11.5px; color: var(--text-muted); margin-top: 2px; }
+
+    .add-contact-form { background: var(--off-white); border-radius: var(--radius-lg); padding: 18px; margin-bottom: 20px; }
+    .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; align-items: end; }
+
+    .sos-history-item { display: flex; align-items: center; gap: 12px; padding: 12px 20px; border-bottom: 1px solid var(--border-card); }
+    .sos-history-item:last-child { border-bottom: none; }
+
+    @media (max-width: 860px) {
+      .sidebar { transform: translateX(-252px); transition: transform 0.3s; }
+      .sidebar.open { transform: translateX(0); }
+      .dashboard-main { margin-left: 0; padding: 20px; }
+      .form-row-3 { grid-template-columns: 1fr; }
+      .sos-button { width: 150px; height: 150px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <a href="index.html" class="nav-logo">
+      <svg class="nav-logo-icon" viewBox="0 0 36 36" fill="none">
+        <path d="M18 3 L5 9 L5 21 Q5 30 18 34 Q31 30 31 21 L31 9 Z" fill="#0f1f3d" stroke="#3d9eff" stroke-width="1.5"/>
+        <path d="M18 10 Q13 15 13 20 Q13 25 18 28 Q23 25 23 20 Q23 15 18 10Z" fill="#3d9eff" opacity="0.9"/>
+        <circle cx="18" cy="22" r="3.5" fill="white"/>
+      </svg>
+      <div class="nav-logo-text"><span class="nav-logo-name">curaah</span><span class="nav-logo-tag">AI Health Companion</span></div>
+    </a>
+    <div class="nav-actions">
+      <span style="font-size:13px;color:var(--text-on-dark-muted);">Hi, <strong style="color:var(--white);" id="navName">—</strong></span>
+      <button class="btn btn-ghost btn-sm" onclick="handleLogout()">Logout</button>
+    </div>
+    <div class="nav-hamburger" id="hamburger" onclick="toggleSidebar()"><span></span><span></span><span></span></div>
+  </nav>
+
+  <div class="dashboard-layout">
+
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-profile">
+        <div class="sidebar-avatar" id="sidebarAvatar">—</div>
+        <div><div class="sidebar-profile-name" id="sidebarName">Loading...</div><div class="sidebar-profile-tag" id="sidebarCity">—</div></div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="sidebar-section-label">Main</div>
+        <a class="sidebar-item" href="dashboard.html"><span class="sidebar-item-icon">🏠</span> Dashboard</a>
+        <a class="sidebar-item" href="prescriptions.html"><span class="sidebar-item-icon">📋</span> Prescriptions</a>
+        <a class="sidebar-item" href="medicines.html"><span class="sidebar-item-icon">💊</span> My Medicines</a>
+        <a class="sidebar-item" href="adherence.html"><span class="sidebar-item-icon">📅</span> Adherence Log</a>
+        <a class="sidebar-item" href="lab-reports.html"><span class="sidebar-item-icon">📊</span> Lab Reports</a>
+        <a class="sidebar-item" href="ai-companion.html"><span class="sidebar-item-icon">🤖</span> AI Companion</a>
+        <div class="sidebar-section-label">Family & Safety</div>
+        <a class="sidebar-item" href="family.html"><span class="sidebar-item-icon">👨‍👩‍👧</span> Family Dashboard</a>
+        <a class="sidebar-item" href="recovery-score.html"><span class="sidebar-item-icon">📈</span> Recovery Score</a>
+        <a class="sidebar-item active" href="sos.html"><span class="sidebar-item-icon">🚨</span> SOS</a>
+        <div class="sidebar-section-label">Account</div>
+        <a class="sidebar-item" href="consent.html"><span class="sidebar-item-icon">🔒</span> Privacy & Consent</a>
+        <a class="sidebar-item" href="profile.html"><span class="sidebar-item-icon">👤</span> My Profile</a>
+      </nav>
+      <div class="sidebar-bottom">
+        <button class="sidebar-item" onclick="handleLogout()" style="color:var(--danger);"><span class="sidebar-item-icon">🚪</span> Logout</button>
+      </div>
+    </aside>
+
+    <main class="dashboard-main">
+
+      <div class="dash-header">
+        <div class="dash-greeting">For genuine emergencies only</div>
+        <div class="dash-title">Emergency SOS</div>
+      </div>
+
+      <!-- ── SOS HERO ── -->
+      <div class="sos-hero">
+
+        <!-- Default state -->
+        <div id="sosDefaultState">
+          <button class="sos-button" id="sosBtn" onclick="startSosCountdown()">
+            <span class="sos-button-icon">🚨</span>
+            SOS
+          </button>
+          <p class="sos-hero-desc">
+            Press and confirm to instantly alert your emergency contacts and share your
+            health information with them, if you've allowed it.
+          </p>
+        </div>
+
+        <!-- Countdown state -->
+        <div class="sos-countdown" id="sosCountdownState">
+          <div class="sos-countdown-num" id="countdownNum">3</div>
+          <div class="sos-countdown-text">Sending alert in <span id="countdownLabel">3</span> seconds...</div>
+          <button class="btn btn-secondary btn-lg" onclick="cancelSos()">Cancel</button>
+        </div>
+
+        <!-- Triggered state -->
+        <div class="sos-triggered" id="sosTriggeredState">
+          <div class="sos-triggered-icon">✅</div>
+          <div class="sos-triggered-title">Alert Sent</div>
+          <p style="color:var(--text-on-dark-muted);font-size:13px;">Your contacts have been notified.</p>
+          <div class="sos-triggered-list" id="alertedContactsList"></div>
+          <button class="btn btn-secondary" style="margin-top:18px;" onclick="resetSosUI()">Done</button>
+        </div>
+
+      </div>
+
+      <!-- ── ADD CONTACT ── -->
+      <div class="add-contact-form">
+        <div style="font-size:13.5px;font-weight:700;color:var(--text-primary);margin-bottom:12px;">+ Add Emergency Contact</div>
+        <div class="form-row-3">
+          <div class="form-group" style="margin:0;">
+            <label class="form-label">Name</label>
+            <input class="form-input" type="text" id="contactName" placeholder="Name" />
+          </div>
+          <div class="form-group" style="margin:0;">
+            <label class="form-label">Phone</label>
+            <input class="form-input" type="tel" id="contactPhone" placeholder="10-digit number" maxlength="10" />
+          </div>
+          <div class="form-group" style="margin:0;">
+            <label class="form-label">Relationship</label>
+            <input class="form-input" type="text" id="contactRelationship" placeholder="e.g. Son" />
+          </div>
+        </div>
+        <div class="checkbox-row" style="margin-top:14px;">
+          <input type="checkbox" id="contactDataAccess" />
+          <label for="contactDataAccess" class="checkbox-row-label">
+            Allow this contact to receive my health summary if I trigger SOS.
+          </label>
+        </div>
+        <button class="btn btn-primary" style="margin-top:14px;" onclick="addContact()">Add Contact</button>
+      </div>
+
+      <!-- ── CONTACTS LIST ── -->
+      <div class="panel">
+        <div class="panel-header"><div class="panel-title">📞 My Emergency Contacts</div></div>
+        <div id="contactsList">
+          <div class="panel-empty"><div>Loading...</div></div>
+        </div>
+      </div>
+
+      <!-- ── HISTORY ── -->
+      <div class="panel">
+        <div class="panel-header"><div class="panel-title">🕓 SOS History</div></div>
+        <div id="sosHistoryList">
+          <div class="panel-empty"><div>Loading...</div></div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script src="js/main.js"></script>
+  <script type="module">
+    import { supabase, requireAuth, signOutUser } from './js/supabase.js';
+
+    let currentUser = null;
+    let countdownInterval = null;
+    let countdownValue = 3;
+
+    async function init() {
+      const session = await requireAuth('login.html');
+      if (!session) return;
+
+      const { data: profile } = await supabase.from('users').select('*').eq('id', session.user.id).single();
+      if (!profile) return;
+
+      currentUser = profile;
+      document.getElementById('navName').textContent       = (profile.full_name || '').split(' ')[0] || '—';
+      document.getElementById('sidebarName').textContent   = profile.full_name || '—';
+      document.getElementById('sidebarAvatar').textContent = getInitials(profile.full_name);
+      document.getElementById('sidebarCity').textContent   = profile.city || 'India';
+
+      await loadContacts();
+      await loadSosHistory();
+    }
+
+    // ── SOS trigger flow with a short cancellable countdown ──
+    window.startSosCountdown = function () {
+      document.getElementById('sosDefaultState').style.display = 'none';
+      document.getElementById('sosCountdownState').classList.add('show');
+
+      countdownValue = 3;
+      document.getElementById('countdownNum').textContent = countdownValue;
+      document.getElementById('countdownLabel').textContent = countdownValue;
+
+      countdownInterval = setInterval(() => {
+        countdownValue--;
+        if (countdownValue <= 0) {
+          clearInterval(countdownInterval);
+          triggerSos();
+        } else {
+          document.getElementById('countdownNum').textContent = countdownValue;
+          document.getElementById('countdownLabel').textContent = countdownValue;
+        }
+      }, 1000);
+    };
+
+    window.cancelSos = function () {
+      clearInterval(countdownInterval);
+      document.getElementById('sosCountdownState').classList.remove('show');
+      document.getElementById('sosDefaultState').style.display = 'block';
+    };
+
+    window.resetSosUI = function () {
+      document.getElementById('sosTriggeredState').classList.remove('show');
+      document.getElementById('sosDefaultState').style.display = 'block';
+    };
+
+    async function triggerSos() {
+      document.getElementById('sosCountdownState').classList.remove('show');
+
+      try {
+        // Get location (best-effort, non-blocking if denied)
+        let lat = null, lng = null;
+        try {
+          const pos = await new Promise((resolve, reject) =>
+            navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 4000 })
+          );
+          lat = pos.coords.latitude;
+          lng = pos.coords.longitude;
+        } catch (_) { /* location denied or unavailable — proceed without it */ }
+
+        // Get active contacts
+        const { data: contacts } = await supabase
+          .from('sos_contacts')
+          .select('*')
+          .eq('user_id', currentUser.id)
+          .eq('is_active', true)
+          .order('notify_order');
+
+        const contactPhones = (contacts || []).map(c => c.phone);
+        const anyDataShared = (contacts || []).some(c => c.can_access_health_data);
+
+        // Log the SOS event
+        const { data: event } = await supabase.from('sos_events').insert({
+          user_id: currentUser.id,
+          location_lat: lat,
+          location_lng: lng,
+          contacts_alerted: contactPhones,
+          health_data_shared: anyDataShared,
+        }).select().single();
+
+        // Attempt to notify via edge function (SMS/WhatsApp dispatch) — non-blocking if not yet configured
+        try {
+          await supabase.functions.invoke('send-sos-alert', {
+            body: { user_id: currentUser.id, event_id: event?.id, lat, lng },
+          });
+        } catch (_) { /* edge function not yet deployed */ }
+
+        // Show triggered state
+        document.getElementById('sosTriggeredState').classList.add('show');
+        const listEl = document.getElementById('alertedContactsList');
+
+        if (!contacts || !contacts.length) {
+          listEl.innerHTML = `<div class="sos-triggered-item">⚠️ No emergency contacts added yet — please add one below for next time.</div>`;
+        } else {
+          listEl.innerHTML = contacts.map(c =>
+            `<div class="sos-triggered-item">📞 ${c.name} (${c.relationship || 'Contact'}) — notified</div>`
+          ).join('');
+        }
+
+        await loadSosHistory();
+
+      } catch (err) {
+        showToast('Could not send the alert. Please call your contact directly.', 'error');
+        document.getElementById('sosDefaultState').style.display = 'block';
+      }
+    }
+
+    // ── Contacts management ──
+    window.addContact = async function () {
+      const name = document.getElementById('contactName').value.trim();
+      const phone = document.getElementById('contactPhone').value.trim();
+      const relationship = document.getElementById('contactRelationship').value.trim();
+      const canAccessData = document.getElementById('contactDataAccess').checked;
+
+      if (!name) { showToast('Please enter a name.', 'error'); return; }
+      if (!isValidPhone(phone)) { showToast('Enter a valid 10-digit phone number.', 'error'); return; }
+
+      const { count } = await supabase
+        .from('sos_contacts')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', currentUser.id);
+
+      const { error } = await supabase.from('sos_contacts').insert({
+        user_id: currentUser.id,
+        name, phone, relationship,
+        is_primary: (count || 0) === 0,
+        notify_order: (count || 0) + 1,
+        can_access_health_data: canAccessData,
+        consent_given_at: canAccessData ? new Date().toISOString() : null,
+      });
+
+      if (error) {
+        showToast('Could not add contact. Please try again.', 'error');
+        return;
+      }
+
+      showToast('Emergency contact added.', 'success');
+      document.getElementById('contactName').value = '';
+      document.getElementById('contactPhone').value = '';
+      document.getElementById('contactRelationship').value = '';
+      document.getElementById('contactDataAccess').checked = false;
+
+      await loadContacts();
+    };
+
+    async function loadContacts() {
+      const { data } = await supabase
+        .from('sos_contacts')
+        .select('*')
+        .eq('user_id', currentUser.id)
+        .eq('is_active', true)
+        .order('notify_order');
+
+      const el = document.getElementById('contactsList');
+
+      if (!data || !data.length) {
+        el.innerHTML = `<div class="panel-empty"><div class="panel-empty-icon">📞</div><div>No emergency contacts added yet. Add at least one above so SOS can actually reach someone.</div></div>`;
+        return;
+      }
+
+      el.innerHTML = data.map(c => `
+        <div class="contact-row">
+          <div class="contact-avatar">${getInitials(c.name)}</div>
+          <div class="contact-info">
+            <div class="contact-name">${c.name} ${c.is_primary ? '<span class="badge badge-blue" style="margin-left:6px;">Primary</span>' : ''}</div>
+            <div class="contact-meta">${c.phone} · ${c.relationship || 'Contact'} ${c.can_access_health_data ? '· Has health data access' : ''}</div>
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="removeContact('${c.id}')">Remove</button>
+        </div>`).join('');
+    }
+
+    window.removeContact = async function (id) {
+      const { error } = await supabase
+        .from('sos_contacts')
+        .update({ is_active: false })
+        .eq('id', id)
+        .eq('user_id', currentUser.id);
+
+      if (error) { showToast('Could not remove contact.', 'error'); return; }
+      showToast('Contact removed.', 'success');
+      await loadContacts();
+    };
+
+    async function loadSosHistory() {
+      const { data } = await supabase
+        .from('sos_events')
+        .select('*')
+        .eq('user_id', currentUser.id)
+        .order('triggered_at', { ascending: false })
+        .limit(10);
+
+      const el = document.getElementById('sosHistoryList');
+
+      if (!data || !data.length) {
+        el.innerHTML = `<div class="panel-empty"><div>No SOS alerts have been triggered. That's a good thing!</div></div>`;
+        return;
+      }
+
+      el.innerHTML = data.map(e => `
+        <div class="sos-history-item">
+          <span style="font-size:16px;">🚨</span>
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:600;color:var(--text-primary);">${new Date(e.triggered_at).toLocaleString('en-IN')}</div>
+            <div style="font-size:11.5px;color:var(--text-muted);">${(e.contacts_alerted || []).length} contact(s) alerted ${e.resolved_at ? '· Resolved' : ''}</div>
+          </div>
+        </div>`).join('');
+    }
+
+    window.handleLogout = async function () {
+      await signOutUser();
+      showToast('Logged out.', 'success');
+      setTimeout(() => { window.location.href = 'index.html'; }, 600);
+    };
+
+    init();
+  </script>
+
+</body>
+</html>
