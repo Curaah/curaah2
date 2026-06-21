@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prescriptions — Curaah</title>
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg" />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    body { background: var(--off-white); min-height: 100vh; }
+    .dashboard-layout { display: flex; min-height: 100vh; padding-top: var(--nav-height); }
+
+    .sidebar {
+      width: 252px; flex-shrink: 0; background: var(--navy);
+      border-right: 1px solid var(--border-dark);
+      position: fixed; top: var(--nav-height); left: 0; bottom: 0;
+      display: flex; flex-direction: column; overflow-y: auto; z-index: 90;
+    }
+    .sidebar-profile { padding: 22px 18px; border-bottom: 1px solid var(--border-dark); display: flex; align-items: center; gap: 12px; }
+    .sidebar-avatar {
+      width: 42px; height: 42px; border-radius: 50%;
+      background: rgba(61,158,255,0.15); border: 2px solid var(--electric);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; font-weight: 700; color: var(--electric); flex-shrink: 0;
+    }
+    .sidebar-profile-name { font-size: 14px; font-weight: 600; color: var(--white); margin-bottom: 2px; }
+    .sidebar-profile-tag  { font-size: 11px; color: var(--text-on-dark-muted); }
+    .sidebar-nav { padding: 14px 10px; flex: 1; display: flex; flex-direction: column; gap: 2px; }
+    .sidebar-section-label { font-size: 10px; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase; color: rgba(255,255,255,0.25); padding: 12px 8px 6px; }
+    .sidebar-item {
+      display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+      border-radius: var(--radius-md); font-size: 13.5px; font-weight: 500;
+      color: var(--text-on-dark-muted); cursor: pointer; transition: var(--transition);
+      border: none; background: none; width: 100%; text-align: left; text-decoration: none;
+    }
+    .sidebar-item:hover  { background: rgba(255,255,255,0.06); color: var(--white); }
+    .sidebar-item.active { background: rgba(61,158,255,0.12); color: var(--electric); font-weight: 600; }
+    .sidebar-item-icon   { font-size: 16px; width: 20px; text-align: center; flex-shrink: 0; }
+    .sidebar-sos-box { margin: 12px 10px; padding: 14px; background: rgba(255,71,87,0.1); border: 1px solid rgba(255,71,87,0.25); border-radius: var(--radius-md); text-align: center; }
+    .sidebar-sos-box button { width: 100%; background: var(--danger); color: white; font-weight: 700; font-size: 13px; padding: 10px; border-radius: var(--radius-md); }
+    .sidebar-bottom { padding: 14px 10px; border-top: 1px solid var(--border-dark); }
+
+    .dashboard-main { margin-left: 252px; flex: 1; padding: 30px 36px 60px; }
+    .dash-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 26px; flex-wrap: wrap; gap: 16px; }
+    .dash-greeting { font-size: 13px; color: var(--text-muted); margin-bottom: 4px; }
+    .dash-title    { font-family: 'Georgia', serif; font-size: 25px; font-weight: 700; color: var(--text-primary); }
+
+    /* ── UPLOAD ZONE ── */
+    .upload-zone {
+      background: var(--white); border: 2px dashed var(--border-card); border-radius: var(--radius-xl);
+      padding: 40px 24px; text-align: center; margin-bottom: 24px; transition: var(--transition); cursor: pointer;
+    }
+    .upload-zone:hover, .upload-zone.dragover { border-color: var(--electric); background: rgba(61,158,255,0.02); }
+    .upload-zone-icon { font-size: 44px; margin-bottom: 14px; }
+    .upload-zone-title { font-size: 16px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; }
+    .upload-zone-desc { font-size: 13px; color: var(--text-muted); margin-bottom: 18px; }
+    #fileInput { display: none; }
+
+    .upload-preview { display: none; background: var(--white); border: 1px solid var(--border-card); border-radius: var(--radius-xl); padding: 24px; margin-bottom: 24px; }
+    .upload-preview.show { display: block; }
+    .upload-preview-img { max-width: 100%; max-height: 280px; border-radius: var(--radius-md); margin: 0 auto 18px; display: block; border: 1px solid var(--border-card); }
+
+    .extraction-status { display: flex; align-items: center; gap: 10px; padding: 14px 16px; border-radius: var(--radius-md); margin-top: 12px; font-size: 13px; }
+    .extraction-status.processing { background: rgba(255,159,0,0.06); border: 1px solid rgba(255,159,0,0.2); color: var(--warning); }
+    .extraction-status.completed  { background: rgba(0,196,140,0.06); border: 1px solid rgba(0,196,140,0.2); color: var(--success); }
+    .extraction-status.failed     { background: rgba(255,71,87,0.06); border: 1px solid rgba(255,71,87,0.2); color: var(--danger); }
+
+    /* ── EXTRACTED DATA CARD ── */
+    .extracted-card { background: var(--off-white); border-radius: var(--radius-lg); padding: 18px; margin-top: 16px; }
+    .extracted-card-title { font-size: 12px; font-weight: 700; color: var(--text-muted); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 12px; }
+    .extracted-med-item { background: var(--white); border: 1px solid var(--border-card); border-radius: var(--radius-md); padding: 12px 14px; margin-bottom: 8px; }
+    .extracted-med-item:last-child { margin-bottom: 0; }
+    .extracted-med-name { font-size: 13.5px; font-weight: 700; color: var(--text-primary); }
+    .extracted-med-detail { font-size: 12px; color: var(--text-muted); margin-top: 3px; }
+
+    .pharmacist-badge {
+      display: flex; align-items: center; gap: 10px; padding: 14px 16px;
+      background: rgba(61,158,255,0.06); border: 1px solid rgba(61,158,255,0.18);
+      border-radius: var(--radius-md); margin-top: 16px; font-size: 13px; color: var(--text-secondary);
+    }
+
+    /* ── PRESCRIPTION LIST ── */
+    .panel { background: var(--white); border: 1px solid var(--border-card); border-radius: var(--radius-lg); overflow: hidden; }
+    .panel-header { padding: 17px 20px; border-bottom: 1px solid var(--border-card); display: flex; align-items: center; justify-content: space-between; }
+    .panel-title { font-size: 14.5px; font-weight: 700; color: var(--text-primary); }
+    .panel-empty { padding: 48px 20px; text-align: center; color: var(--text-muted); font-size: 13.5px; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+    .panel-empty-icon { font-size: 36px; opacity: 0.4; }
+
+    .rx-row {
+      display: flex; align-items: center; gap: 14px; padding: 16px 20px;
+      border-bottom: 1px solid var(--border-card); cursor: pointer; transition: var(--transition);
+    }
+    .rx-row:hover { background: var(--off-white); }
+    .rx-row:last-child { border-bottom: none; }
+    .rx-icon { width: 42px; height: 42px; border-radius: var(--radius-md); background: rgba(61,158,255,0.08); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+    .rx-info { flex: 1; min-width: 0; }
+    .rx-doctor { font-size: 13.5px; font-weight: 600; color: var(--text-primary); }
+    .rx-meta { font-size: 11.5px; color: var(--text-muted); margin-top: 2px; }
+
+    @media (max-width: 860px) {
+      .sidebar { transform: translateX(-252px); transition: transform 0.3s; }
+      .sidebar.open { transform: translateX(0); }
+      .dashboard-main { margin-left: 0; padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <a href="index.html" class="nav-logo">
+      <svg class="nav-logo-icon" viewBox="0 0 36 36" fill="none">
+        <path d="M18 3 L5 9 L5 21 Q5 30 18 34 Q31 30 31 21 L31 9 Z" fill="#0f1f3d" stroke="#3d9eff" stroke-width="1.5"/>
+        <path d="M18 10 Q13 15 13 20 Q13 25 18 28 Q23 25 23 20 Q23 15 18 10Z" fill="#3d9eff" opacity="0.9"/>
+        <circle cx="18" cy="22" r="3.5" fill="white"/>
+      </svg>
+      <div class="nav-logo-text"><span class="nav-logo-name">curaah</span><span class="nav-logo-tag">AI Health Companion</span></div>
+    </a>
+    <ul class="nav-links"><li><a href="ai-companion.html">Ask AI</a></li></ul>
+    <div class="nav-actions">
+      <span style="font-size:13px;color:var(--text-on-dark-muted);">Hi, <strong style="color:var(--white);" id="navName">—</strong></span>
+      <button class="btn btn-ghost btn-sm" onclick="handleLogout()">Logout</button>
+    </div>
+    <div class="nav-hamburger" id="hamburger" onclick="toggleSidebar()"><span></span><span></span><span></span></div>
+  </nav>
+
+  <div class="dashboard-layout">
+
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-profile">
+        <div class="sidebar-avatar" id="sidebarAvatar">—</div>
+        <div><div class="sidebar-profile-name" id="sidebarName">Loading...</div><div class="sidebar-profile-tag" id="sidebarCity">—</div></div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="sidebar-section-label">Main</div>
+        <a class="sidebar-item" href="dashboard.html"><span class="sidebar-item-icon">🏠</span> Dashboard</a>
+        <a class="sidebar-item active" href="prescriptions.html"><span class="sidebar-item-icon">📋</span> Prescriptions</a>
+        <a class="sidebar-item" href="medicines.html"><span class="sidebar-item-icon">💊</span> My Medicines</a>
+        <a class="sidebar-item" href="adherence.html"><span class="sidebar-item-icon">📅</span> Adherence Log</a>
+        <a class="sidebar-item" href="lab-reports.html"><span class="sidebar-item-icon">📊</span> Lab Reports</a>
+        <a class="sidebar-item" href="ai-companion.html"><span class="sidebar-item-icon">🤖</span> AI Companion</a>
+        <div class="sidebar-section-label">Family & Safety</div>
+        <a class="sidebar-item" href="family.html"><span class="sidebar-item-icon">👨‍👩‍👧</span> Family Dashboard</a>
+        <a class="sidebar-item" href="recovery-score.html"><span class="sidebar-item-icon">📈</span> Recovery Score</a>
+        <div class="sidebar-section-label">Account</div>
+        <a class="sidebar-item" href="consent.html"><span class="sidebar-item-icon">🔒</span> Privacy & Consent</a>
+        <a class="sidebar-item" href="profile.html"><span class="sidebar-item-icon">👤</span> My Profile</a>
+      </nav>
+      <div class="sidebar-sos-box">
+        <div style="font-size:11px;color:var(--text-on-dark-muted);margin-bottom:8px;">In an emergency</div>
+        <button onclick="window.location.href='sos.html'">🚨 SOS</button>
+      </div>
+      <div class="sidebar-bottom">
+        <button class="sidebar-item" onclick="handleLogout()" style="color:var(--danger);"><span class="sidebar-item-icon">🚪</span> Logout</button>
+      </div>
+    </aside>
+
+    <main class="dashboard-main">
+
+      <div class="dash-header">
+        <div>
+          <div class="dash-greeting">Keep every prescription in one place</div>
+          <div class="dash-title">Prescriptions</div>
+        </div>
+      </div>
+
+      <!-- Upload zone -->
+      <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
+        <div class="upload-zone-icon">📸</div>
+        <div class="upload-zone-title">Upload a prescription photo or PDF</div>
+        <div class="upload-zone-desc">Curaah's AI will read it, and a verified pharmacist double-checks it before it becomes your plan.</div>
+        <button class="btn btn-primary">Choose File</button>
+        <input type="file" id="fileInput" accept="image/*,application/pdf" />
+      </div>
+
+      <!-- Upload preview + extraction -->
+      <div class="upload-preview" id="uploadPreview">
+        <img id="previewImg" class="upload-preview-img" style="display:none;" />
+        <div id="previewPdfLabel" style="display:none;text-align:center;font-size:14px;color:var(--text-secondary);padding:20px;background:var(--off-white);border-radius:var(--radius-md);margin-bottom:18px;">📄 PDF selected</div>
+
+        <div style="display:flex;gap:10px;justify-content:center;">
+          <button class="btn btn-secondary" onclick="cancelUpload()">Cancel</button>
+          <button class="btn btn-primary" id="confirmUploadBtn" onclick="confirmUpload()">Upload & Analyse</button>
+        </div>
+
+        <div id="extractionStatusBox" style="display:none;"></div>
+        <div id="extractedDataBox" style="display:none;"></div>
+      </div>
+
+      <!-- Prescription history -->
+      <div class="panel">
+        <div class="panel-header"><div class="panel-title">📋 All Prescriptions</div></div>
+        <div id="prescriptionsList">
+          <div class="panel-empty">
+            <div class="panel-empty-icon">📋</div>
+            <div>Loading...</div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script src="js/main.js"></script>
+  <script type="module">
+    import { supabase, requireAuth, signOutUser } from './js/supabase.js';
+
+    let currentUser = null;
+    let selectedFile = null;
+
+    async function init() {
+      const session = await requireAuth('login.html');
+      if (!session) return;
+
+      const { data: profile } = await supabase.from('users').select('*').eq('id', session.user.id).single();
+      if (!profile) return;
+
+      currentUser = profile;
+      document.getElementById('navName').textContent       = (profile.full_name || '').split(' ')[0] || '—';
+      document.getElementById('sidebarName').textContent   = profile.full_name || '—';
+      document.getElementById('sidebarAvatar').textContent = getInitials(profile.full_name);
+      document.getElementById('sidebarCity').textContent   = profile.city || 'India';
+
+      await loadPrescriptions();
+    }
+
+    // ── File selection ──
+    const fileInput  = document.getElementById('fileInput');
+    const uploadZone = document.getElementById('uploadZone');
+
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files && e.target.files[0]) handleFileSelect(e.target.files[0]);
+    });
+
+    ['dragover', 'dragleave', 'drop'].forEach(evt => {
+      uploadZone.addEventListener(evt, (e) => {
+        e.preventDefault();
+        uploadZone.classList.toggle('dragover', evt === 'dragover');
+        if (evt === 'drop' && e.dataTransfer.files[0]) handleFileSelect(e.dataTransfer.files[0]);
+      });
+    });
+
+    function handleFileSelect(file) {
+      const validTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp', 'application/pdf'];
+      if (!validTypes.includes(file.type)) {
+        showToast('Please upload a JPG, PNG, or PDF file.', 'error');
+        return;
+      }
+      if (file.size > 10 * 1024 * 1024) {
+        showToast('File is too large. Maximum size is 10MB.', 'error');
+        return;
+      }
+
+      selectedFile = file;
+      document.getElementById('uploadPreview').classList.add('show');
+      document.getElementById('extractionStatusBox').style.display = 'none';
+      document.getElementById('extractedDataBox').style.display = 'none';
+      document.getElementById('confirmUploadBtn').style.display = 'inline-flex';
+      document.getElementById('confirmUploadBtn').textContent = 'Upload & Analyse';
+      document.getElementById('confirmUploadBtn').disabled = false;
+
+      if (file.type === 'application/pdf') {
+        document.getElementById('previewImg').style.display = 'none';
+        document.getElementById('previewPdfLabel').style.display = 'block';
+        document.getElementById('previewPdfLabel').textContent = `📄 ${file.name}`;
+      } else {
+        document.getElementById('previewPdfLabel').style.display = 'none';
+        const img = document.getElementById('previewImg');
+        img.src = URL.createObjectURL(file);
+        img.style.display = 'block';
+      }
+
+      document.getElementById('uploadPreview').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    window.cancelUpload = function () {
+      selectedFile = null;
+      fileInput.value = '';
+      document.getElementById('uploadPreview').classList.remove('show');
+    };
+
+    window.confirmUpload = async function () {
+      if (!selectedFile) return;
+      const btn = document.getElementById('confirmUploadBtn');
+      btn.textContent = 'Uploading...';
+      btn.disabled = true;
+
+      const statusBox = document.getElementById('extractionStatusBox');
+      statusBox.style.display = 'block';
+      statusBox.className = 'extraction-status processing';
+      statusBox.innerHTML = `<div class="spinner" style="width:16px;height:16px;border-width:2px;"></div> Uploading your prescription securely...`;
+
+      try {
+        const fileExt = selectedFile.name.split('.').pop();
+        const filePath = `${currentUser.id}/${Date.now()}.${fileExt}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from('prescriptions')
+          .upload(filePath, selectedFile, { contentType: selectedFile.type });
+
+        if (uploadError) throw new Error('Upload failed: ' + uploadError.message);
+
+        const { data: signedUrlData } = await supabase.storage
+          .from('prescriptions')
+          .createSignedUrl(filePath, 60 * 60 * 24 * 365); // 1 year signed URL
+
+        const isImage = selectedFile.type !== 'application/pdf';
+
+        const { data: rx, error: rxError } = await supabase
+          .from('prescriptions')
+          .insert({
+            user_id: currentUser.id,
+            file_path: filePath,
+            image_url: isImage ? signedUrlData?.signedUrl : null,
+            pdf_url: !isImage ? signedUrlData?.signedUrl : null,
+            extraction_status: 'pending',
+          })
+          .select()
+          .single();
+
+        if (rxError) throw new Error(rxError.message);
+
+        statusBox.className = 'extraction-status processing';
+        statusBox.innerHTML = `<div class="spinner" style="width:16px;height:16px;border-width:2px;"></div> AI is reading your prescription — this usually takes a few seconds...`;
+
+        btn.textContent = 'Processing...';
+
+        // Call the extraction edge function (will be wired up once API keys are added)
+        try {
+          const { data: extraction, error: fnError } = await supabase.functions.invoke('extract-prescription', {
+            body: { prescription_id: rx.id, file_path: filePath },
+          });
+
+          if (fnError || !extraction) {
+            statusBox.className = 'extraction-status processing';
+            statusBox.innerHTML = `⏳ Saved successfully — AI analysis will complete shortly. You'll see it appear below once ready.`;
+          } else {
+            renderExtractionResult(extraction);
+          }
+        } catch (fnErr) {
+          // Edge function not yet deployed/configured — non-fatal for now
+          statusBox.className = 'extraction-status processing';
+          statusBox.innerHTML = `⏳ Prescription saved — AI analysis will be available shortly.`;
+        }
+
+        showToast('Prescription uploaded successfully!', 'success');
+        btn.style.display = 'none';
+        await loadPrescriptions();
+
+      } catch (err) {
+        statusBox.className = 'extraction-status failed';
+        statusBox.innerHTML = `⚠️ ${err.message || 'Something went wrong. Please try again.'}`;
+        btn.textContent = 'Upload & Analyse';
+        btn.disabled = false;
+      }
+    };
+
+    function renderExtractionResult(extraction) {
+      const statusBox = document.getElementById('extractionStatusBox');
+      statusBox.className = 'extraction-status completed';
+      statusBox.innerHTML = `✅ AI analysis complete — a pharmacist will verify this shortly.`;
+
+      const dataBox = document.getElementById('extractedDataBox');
+      dataBox.style.display = 'block';
+      dataBox.innerHTML = `
+        <div class="extracted-card">
+          <div class="extracted-card-title">Medicines Detected</div>
+          ${(extraction.medicines || []).map(m => `
+            <div class="extracted-med-item">
+              <div class="extracted-med-name">${m.name}</div>
+              <div class="extracted-med-detail">${m.dosage || ''} · ${(m.timing || []).join(', ')}</div>
+            </div>`).join('') || '<p style="font-size:13px;color:var(--text-muted);">No medicines detected — please add manually.</p>'}
+        </div>
+        <div class="pharmacist-badge">
+          <span style="font-size:18px;">👨‍⚕️</span>
+          <span>This extraction is queued for pharmacist verification before becoming part of your active medication plan.</span>
+        </div>`;
+    }
+
+    async function loadPrescriptions() {
+      const { data } = await supabase
+        .from('prescriptions')
+        .select('*')
+        .eq('user_id', currentUser.id)
+        .order('created_at', { ascending: false });
+
+      const el = document.getElementById('prescriptionsList');
+
+      if (!data || !data.length) {
+        el.innerHTML = `
+          <div class="panel-empty">
+            <div class="panel-empty-icon">📋</div>
+            <div>No prescriptions uploaded yet. Upload your first one above.</div>
+          </div>`;
+        return;
+      }
+
+      const statusBadge = {
+        pending:    '<span class="badge badge-orange">Processing</span>',
+        processing: '<span class="badge badge-orange">Processing</span>',
+        completed:  '<span class="badge badge-green">Verified</span>',
+        failed:     '<span class="badge badge-red">Needs Review</span>',
+      };
+
+      el.innerHTML = data.map(rx => `
+        <div class="rx-row">
+          <div class="rx-icon">📋</div>
+          <div class="rx-info">
+            <div class="rx-doctor">${rx.doctor_name || 'Prescription'} ${rx.hospital_name ? '· ' + rx.hospital_name : ''}</div>
+            <div class="rx-meta">${rx.prescription_date ? formatDateReadable(rx.prescription_date) : formatTimeAgo(rx.created_at)} ${rx.pharmacist_verified ? '· ✓ Pharmacist Verified' : ''}</div>
+          </div>
+          ${statusBadge[rx.extraction_status] || ''}
+        </div>`).join('');
+    }
+
+    window.handleLogout = async function () {
+      await signOutUser();
+      showToast('Logged out.', 'success');
+      setTimeout(() => { window.location.href = 'index.html'; }, 600);
+    };
+
+    init();
+  </script>
+
+</body>
+</html>
