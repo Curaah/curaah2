@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Privacy Policy — Curaah</title>
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg" />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    body { background: var(--off-white); }
+
+    .policy-hero { background: var(--navy); padding: calc(var(--nav-height) + 48px) 6% 48px; text-align: center; }
+    .policy-hero-tag { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--electric); margin-bottom: 12px; }
+    .policy-hero-title { font-family: 'Georgia', serif; font-size: clamp(28px, 4vw, 42px); font-weight: 700; color: var(--white); margin-bottom: 12px; }
+    .policy-hero-sub { font-size: 15px; color: var(--text-on-dark-muted); max-width: 580px; margin: 0 auto; line-height: 1.7; }
+    .policy-hero-date { margin-top: 16px; font-size: 12px; color: rgba(255,255,255,0.4); }
+
+    .policy-content { max-width: 780px; margin: 0 auto; padding: 56px 6%; }
+    .policy-section { margin-bottom: 46px; }
+    .policy-section-num { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--electric); margin-bottom: 8px; }
+    .policy-section-title { font-family: 'Georgia', serif; font-size: 21px; font-weight: 700; color: var(--text-primary); margin-bottom: 16px; }
+    .policy-text { font-size: 15px; color: var(--text-secondary); line-height: 1.85; margin-bottom: 16px; }
+    .policy-text:last-child { margin-bottom: 0; }
+
+    .policy-list { list-style: none; padding: 0; margin: 0 0 16px 0; display: flex; flex-direction: column; gap: 10px; }
+    .policy-list li { display: flex; align-items: flex-start; gap: 10px; font-size: 15px; color: var(--text-secondary); line-height: 1.7; }
+    .policy-list li::before { content: '•'; color: var(--electric); font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+
+    .policy-highlight { background: rgba(61,158,255,0.05); border: 1px solid rgba(61,158,255,0.15); border-left: 3px solid var(--electric); border-radius: 0 var(--radius-md) var(--radius-md) 0; padding: 16px 20px; margin-bottom: 16px; font-size: 14px; color: var(--text-secondary); line-height: 1.7; }
+    .policy-highlight strong { color: var(--text-primary); }
+
+    .policy-warning { background: rgba(255,159,0,0.05); border: 1px solid rgba(255,159,0,0.2); border-left: 3px solid var(--warning); border-radius: 0 var(--radius-md) var(--radius-md) 0; padding: 16px 20px; margin-bottom: 16px; font-size: 14px; color: var(--text-secondary); line-height: 1.7; }
+
+    .policy-divider { height: 1px; background: var(--border-card); margin: 46px 0; }
+
+    .policy-toc { background: var(--white); border: 1px solid var(--border-card); border-radius: var(--radius-lg); padding: 24px; margin-bottom: 46px; }
+    .policy-toc-title { font-size: 13px; font-weight: 700; color: var(--text-primary); margin-bottom: 14px; letter-spacing: 0.5px; text-transform: uppercase; }
+    .policy-toc-list { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .policy-toc-list li a { font-size: 13.5px; color: var(--electric); text-decoration: none; }
+    .policy-toc-list li a:hover { text-decoration: underline; }
+
+    .data-table { width: 100%; border-collapse: collapse; margin-bottom: 16px; font-size: 13px; }
+    .data-table th { text-align: left; padding: 10px 12px; background: var(--off-white); color: var(--text-primary); font-weight: 700; border-bottom: 1px solid var(--border-card); }
+    .data-table td { padding: 10px 12px; border-bottom: 1px solid var(--border-card); color: var(--text-secondary); vertical-align: top; }
+
+    .contact-box { background: var(--navy); border-radius: var(--radius-lg); padding: 32px; text-align: center; }
+    .contact-box-title { font-family: 'Georgia', serif; font-size: 22px; font-weight: 700; color: var(--white); margin-bottom: 10px; }
+    .contact-box-desc { font-size: 14px; color: var(--text-on-dark-muted); line-height: 1.7; margin-bottom: 20px; }
+    .contact-box-email { font-size: 16px; font-weight: 600; color: var(--electric); }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <a href="index.html" class="nav-logo">
+      <svg class="nav-logo-icon" viewBox="0 0 36 36" fill="none">
+        <path d="M18 3 L5 9 L5 21 Q5 30 18 34 Q31 30 31 21 L31 9 Z" fill="#0f1f3d" stroke="#3d9eff" stroke-width="1.5"/>
+        <path d="M18 10 Q13 15 13 20 Q13 25 18 28 Q23 25 23 20 Q23 15 18 10Z" fill="#3d9eff" opacity="0.9"/>
+        <circle cx="18" cy="22" r="3.5" fill="white"/>
+      </svg>
+      <div class="nav-logo-text"><span class="nav-logo-name">curaah</span><span class="nav-logo-tag">AI Health Companion</span></div>
+    </a>
+    <ul class="nav-links"><li><a href="index.html">Home</a></li></ul>
+    <div class="nav-actions">
+      <a href="login.html" class="btn btn-ghost btn-sm">Login</a>
+      <a href="register.html" class="btn btn-primary btn-sm">Start Free</a>
+    </div>
+  </nav>
+
+  <section class="policy-hero">
+    <div class="policy-hero-tag">Legal</div>
+    <h1 class="policy-hero-title">Privacy Policy</h1>
+    <p class="policy-hero-sub">
+      Your health information is yours. This policy explains exactly what Curaah collects,
+      why, how AI is involved, and how you stay in control at every step.
+    </p>
+    <div class="policy-hero-date">Last updated: May 2026 · Version 1.0 · Effective immediately</div>
+  </section>
+
+  <div class="policy-content">
+
+    <div class="policy-toc">
+      <div class="policy-toc-title">Contents</div>
+      <ul class="policy-toc-list">
+        <li><a href="#who-we-are">1. Who We Are</a></li>
+        <li><a href="#what-we-collect">2. What Data We Collect</a></li>
+        <li><a href="#ai-processing">3. How AI Processes Your Data</a></li>
+        <li><a href="#why-we-collect">4. Why We Collect It</a></li>
+        <li><a href="#who-we-share">5. Who We Share It With</a></li>
+        <li><a href="#family-sharing">6. Family Member Sharing</a></li>
+        <li><a href="#how-we-protect">7. How We Protect Your Data</a></li>
+        <li><a href="#your-rights">8. Your Rights</a></li>
+        <li><a href="#retention">9. Data Retention</a></li>
+        <li><a href="#cookies">10. Cookies</a></li>
+        <li><a href="#children">11. Children's Data</a></li>
+        <li><a href="#dpdp">12. DPDP Act 2023 Compliance</a></li>
+        <li><a href="#breach">13. Breach Notification</a></li>
+        <li><a href="#changes">14. Changes to This Policy</a></li>
+        <li><a href="#contact">15. Contact Us</a></li>
+      </ul>
+    </div>
+
+    <div class="policy-highlight">
+      <strong>In plain language:</strong> Curaah collects your health information — prescriptions, medicines,
+      lab reports, and daily logs — to act as your AI health companion. AI helps read and explain this
+      data, but a human pharmacist verifies anything that becomes part of your active treatment plan.
+      We never sell your data. You can delete everything, anytime, from your account settings.
+    </div>
+
+    <!-- 1 -->
+    <div class="policy-section" id="who-we-are">
+      <div class="policy-section-num">Section 01</div>
+      <div class="policy-section-title">Who We Are</div>
+      <p class="policy-text">
+        Curaah is an AI-powered health and medication adherence companion, built and operated by
+        <strong>Curaah HealthTech Pvt Ltd</strong>, a company based in Nangal, Punjab, India.
+      </p>
+      <p class="policy-text">
+        Curaah is a technology platform — not a hospital, clinic, pharmacy, or licensed healthcare
+        provider. We help you understand, organise, and stay consistent with the care your doctor
+        has already prescribed. We do not replace your doctor, and we never claim to.
+      </p>
+      <p class="policy-text">
+        For any privacy questions, contact us at <strong>curaahtech@gmail.com</strong>.
+      </p>
+    </div>
+
+    <div class="policy-divider"></div>
+
+    <!-- 2 -->
+    <div class="policy-section" id="what-we-collect">
+      <div class="policy-section-num">Section 02</div>
+      <div class="policy-section-title">What Data We Collect</div>
+
+      <table class="data-table">
+        <tr><th>Category</th><th>Examples</th></tr>
+        <tr><td>Identity</td><td>Name, phone number, email, date of birth, gender, city</td></tr>
+        <tr><td>Health profile</td><td>Conditions, allergies, family history, lifestyle habits, blood group</td></tr>
+        <tr><td>Prescriptions</td><td>Photos/PDFs you upload, AI-extracted medicine names, dosages, and timings</td></tr>
+        <tr><td>Medicines</td><td>Strip/tablet photos, identified salts and compositions, your daily schedule</td></tr>
+        <tr><td>Adherence logs</td><td>Whether each dose was taken, skipped, or delayed, and why</td></tr>
+        <tr><td>Food & exercise</td><td>Meal descriptions and photos, exercise type and duration</td></tr>
+        <tr><td>Lab reports</td><td>Uploaded reports, extracted values, AI explanations, trend comparisons</td></tr>
+        <tr><td>AI conversations</td><td>Messages you send the AI Companion, and its responses</td></tr>
+        <tr><td>Family & SOS</td><td>Names and numbers of people you invite or add as emergency contacts</td></tr>
+        <tr><td>Technical</td><td>IP address, browser type, device info, login timestamps</td></tr>
+      </table>
+
+      <p class="policy-text"><strong>What we do NOT collect:</strong></p>
+      <ul class="policy-list">
+        <li>Aadhaar number or any government ID, unless you separately opt to link ABHA in future</li>
+        <li>Bank account, UPI, or payment card details</li>
+        <li>Continuous or background location — we only ever request location once, at the moment you trigger SOS</li>
+        <li>Contacts, camera roll, or microphone access beyond what you explicitly upload or record</li>
+        <li>Any data from other apps on your device</li>
+      </ul>
+    </div>
+
+    <div class="policy-divider"></div>
+
+    <!-- 3 -->
+    <div class="policy-section" id="ai-processing">
+      <div class="policy-section-num">Section 03</div>
+      <div class="policy-section-title">How AI Processes Your Data</div>
+      <p class="policy-text">
+        Curaah uses artificial intelligence to make your health data understandable and actionable.
+        Specifically:
+      </p>
+      <ul class="policy-list">
+        <li><strong>Prescription reading</strong> — AI extracts medicine names, doses, and timings from photos you upload. A verified pharmacist checks this before it becomes your active medication plan, since handwriting can be misread.</li>
+        <li><strong>Lab report explanation</strong> — AI reads your uploaded reports and explains values in plain Hindi, Punjabi, or English.</li>
+        <li><strong>Medicine identification</strong> — AI analyses photos of strips or tablets to identify the medicine and check it against your schedule.</li>
+        <li><strong>The AI Companion chat</strong> — When you ask a question, AI uses a snapshot of your health profile (conditions, medicines, recent adherence) to give a relevant answer, without you needing to re-explain your history each time.</li>
+      </ul>
+      <p class="policy-text">
+        Your raw data is sent securely to our AI processing partners only through our backend
+        servers — never directly from your device to a third party. We currently use Sarvam AI
+        for Indian-language understanding, and large language model providers (such as Anthropic
+        or Google) for reasoning over your health context, accessed only through our own secured
+        server-side integration, never with API keys exposed publicly.
+      </p>
+      <div class="policy-warning">
+        <strong>AI is not a doctor.</strong> Every AI response is accompanied by a clear disclaimer.
+        AI-generated suggestions are general guidance, not diagnosis or prescription, and always
+        direct you back to a qualified doctor for medical decisions.
+      </div>
+    </div>
+
+    <div class="policy-divider"></div>
+
+    <!-- 4 -->
+    <div class="policy-section" id="why-we-collect">
+      <div class="policy-section-num">Section 04</div>
+      <div class="policy-section-title">Why We Collect It</div>
+      <ul class="policy-list">
+        <li><strong>To build your Digital Health Twin</strong> — a profile that lets Curaah genuinely understand your situation over time</li>
+        <li><strong>To track medication adherence</strong> — so reminders, follow-ups, and your Recovery Score reflect reality</li>
+        <li><strong>To explain lab reports and medicines</strong> — in language you actually understand</li>
+        <li><strong>To detect possible medicine interactions</strong> — especially when you see multiple doctors</li>
+        <li><strong>To enable family caregiving</strong> — only for people you explicitly invite and approve</li>
+        <li><strong>To respond in an emergency</strong> — SOS sharing only happens when you trigger it, and only with contacts you've allowed</li>
+      </ul>
+      <p class="policy-text">
+        We never use your health data for advertising, and we never sell it to insurers,
+        pharmaceutical companies, or any third party.
+      </p>
+    </div>
+
+    <div class="policy-divider"></div>
+
+    <!-- 5 -->
+    <div class="policy-section" id="who-we-share">
+      <div class="policy-section-num">Section 05</div>
+      <div class="policy-section-title">Who We Share It With</div>
+      <div class="policy-highlight"><strong>We do not sell your data to anyone, ever.</strong></div>
+      <ul class="policy-list">
+        <li><strong>Supabase</strong> — our database, authentication, and file storage provider (SOC 2 Type 2 certified). All data is encrypted at rest and in transit.</li>
+        <li><strong>AI processing partners</strong> — Sarvam AI and large language model providers, accessed only via our secured backend, used solely to generate the explanations and responses described above.</li>
+        <li><strong>Verified pharmacists</strong> — to confirm AI-extracted prescription data before it becomes your active plan. Pharmacists see only the prescription needed for verification, not your full profile.</li>
+        <li><strong>Family members you invite</strong> — only what you explicitly permit (see Section 6).</li>
+        <li><strong>Emergency contacts</strong> — only if you trigger SOS, and only contacts you've marked to receive health data.</li>
+      </ul>
+      <p class="policy-text">
+        We will disclose information if legally required to do so by an Indian court or
+        government authority, and will notify you where legally permitted.
+      </p>
+    </div>
+
+    <div class="policy-divider"></div>
+
+    <!-- 6 -->
+    <div class="policy-section" id="family-sharing">
+      <div class="policy-section-num">Section 06</div>
+      <div class="policy-section-title">Family Member Sharing</div>
+      <p class="policy-text">
+        Family sharing in Curaah is opt-in, granular, and fully reversible:
+      </p>
+      <ul class="policy-list">
+        <li>You choose who to invite — nobody gets access automatically</li>
+        <li>You choose exactly what they can see: medicines & adherence, lab reports, both, or emergency-only</li>
+        <li>Every grant and revoke is timestamped and logged for your own audit trail</li>
+        <li>You can revoke any family member's access instantly, at any time, from the Family Dashboard</li>
+      </ul>
+    </div>
+
+    <div class="policy-divider"></div>
+
+    <!-- 7 -->
+    <div class="policy-section" id="how-we-protect">
+      <div class="policy-section-num">Section 07</div>
+      <div class="policy-section-title">How We Protect Your Data</div>
+      <ul class="policy-list">
+        <li><strong>Encryption</strong> — all data encrypted at rest (AES-256) and in transit (HTTPS/TLS)</li>
+        <li><strong>Row Level Security</strong> — database-enforced rules ensure you can only ever access your own data, and family members only see what you've explicitly permitted</li>
+        <li><strong>Private file storage</strong> — prescriptions, lab reports, and photos are stored privately and accessed only via short-lived signed URLs, never public links</li>
+        <li><strong>Server-side AI keys</strong> — AI provider credentials are never exposed in app code; all AI calls run through our secured backend functions</li>
+        <li><strong>Consent audit trail</strong> — every consent you give or revoke is permanently logged with a timestamp, for transparency and compliance</li>
+      </ul>
+    </div>
+
+    <div class="policy-divider"></div>
+
+    <!-- 8 -->
+    <div class="policy-section" id="your-rights">
+      <div class="policy-section-num">Section 08</div>
+      <div class="policy-section-title">Your Rights</div>
+      <p class="policy-text">Under the Digital Personal Data Protection Act, 2023, you have the right to:</p>
+      <ul class="policy-list">
+        <li><strong>Access</strong> — view all your data anytime from your Curaah dashboard</li>
+        <li><strong>Correct</strong> — update inaccurate details yourself, or email us for help</li>
+        <li><strong>Withdraw consent</strong> — turn off optional consents (family sharing, research, marketing) anytime from Privacy & Consent settings, without losing your account</li>
+        <li><strong>Erase</strong> — request full account and data deletion; we complete this within 30 days</li>
+        <li><strong>Data portability</strong> — request an exportable copy of your data</li>
+        <li><strong>Grievance redressal</strong> — raise a concern and receive a response within 7 days</li>
+      </ul>
+      <p class="policy-text">
+        To exercise any of these, use the in-app <a href="consent.html" style="color:var(--electric);font-weight:600;">Privacy & Consent</a>
+        page, or email <strong>curaahtech@gmail.com</strong> with your registered phone number.
+      </p>
+    </div>
+
+    <div class="policy-divider"></div>
+
+    <!-- 9 -->
+    <div class="policy-section" id="retention">
+      <div class="policy-section-num">Section 09</div>
+      <div class="policy-section-title">Data Retention</div>
+      <ul class="policy-list">
+        <li><strong>Account & profile data</strong> — retained while your account is active</li>
+        <li><strong>Prescriptions & medicines</strong> — retained for continuity of care, up to 5 years, or until you delete them</li>
+        <li><strong>Adherence & lifestyle logs</strong> — retained for 3 years to support trend analysis</li>
+        <li><strong>AI conversation history</strong> — retained for 1 year, used to maintain conversation context</li>
+        <li><strong>Consent & audit logs</strong> — retained for 7 years as required for compliance record-keeping</li>
+      </ul>
+      <p class="policy-text">
+        On account deletion, personal data is removed within 30 days. Some anonymised, aggregated
+        data (with no name, phone, or identifying detail) may be retained for service improvement,
+        only if you separately consented to research use.
+      </p>
+    </div>
+
+    <div class="policy-divider"></div>
+
+    <!-- 10 -->
+    <div class="policy-section" id="cookies">
+      <div class="policy-section-num">Section 10</div>
+      <div class="policy-section-title">Cookies</div>
+      <p class="policy-text">
+        Curaah uses only essential session and authentication cookies needed to keep you logged
+        in. We do not use advertising trackers, analytics pixels, or any third-party tracking
+        cookies.
+      </p>
+    </div>
+
+    <div class="policy-divider"></div>
+
+    <!-- 11 -->
+    <div class="policy-section" id="children">
+      <div class="policy-section-num">Section 11</div>
+      <div class="policy-section-title">Children's Data</div>
+      <p class="policy-text">
+        Curaah accounts are intended for users 18 and older. If a parent or guardian wishes to
+        manage a child's medication, they should do so under their own account and add the
+        child's details within their own health profile, with appropriate care. Contact us if
+        you believe a minor's data was collected inappropriately, and we will act promptly.
+      </p>
+    </div>
+
+    <div class="policy-divider"></div>
+
+    <!-- 12 -->
+    <div class="policy-section" id="dpdp">
+      <div class="policy-section-num">Section 12</div>
+      <div class="policy-section-title">DPDP Act 2023 Compliance</div>
+      <ul class="policy-list">
+        <li><strong>Explicit, granular consent</strong> — collected separately for health data processing, AI analysis, family sharing, research, and marketing — never bundled into one blanket agreement</li>
+        <li><strong>Purpose limitation</strong> — data used only for the purposes described in this policy</li>
+        <li><strong>Sensitive personal data classification</strong> — your health information is treated with heightened care as sensitive personal data under the Act</li>
+        <li><strong>Data minimisation</strong> — we only collect what's genuinely needed for Curaah to function</li>
+        <li><strong>Grievance officer</strong> — reachable at curaahtech@gmail.com for any data protection concern</li>
+      </ul>
+      <p class="policy-text">
+        As the Government of India finalises DPDP implementation rules, we will update our
+        practices and this policy accordingly.
+      </p>
+    </div>
+
+    <div class="policy-divider"></div>
+
+    <!-- 13 -->
+    <div class="policy-section" id="breach">
+      <div class="policy-section-num">Section 13</div>
+      <div class="policy-section-title">Breach Notification</div>
+      <p class="policy-text">
+        In the unlikely event of a data breach affecting your personal data, we will notify
+        affected users and the relevant authority within 72 hours of becoming aware of the
+        breach, in line with DPDP Act requirements, along with the steps we are taking to
+        contain and resolve it.
+      </p>
+    </div>
+
+    <div class="policy-divider"></div>
+
+    <!-- 14 -->
+    <div class="policy-section" id="changes">
+      <div class="policy-section-num">Section 14</div>
+      <div class="policy-section-title">Changes to This Policy</div>
+      <p class="policy-text">
+        We'll update the date at the top of this page whenever this policy changes. For changes
+        that materially affect your rights, we'll notify registered users by email or in-app
+        notice at least 7 days in advance. Continuing to use Curaah after an update means you
+        accept the revised policy; if you disagree, you may request account deletion anytime.
+      </p>
+    </div>
+
+    <div class="policy-divider"></div>
+
+    <!-- 15 -->
+    <div class="policy-section" id="contact">
+      <div class="policy-section-num">Section 15</div>
+      <div class="policy-section-title">Contact Us</div>
+      <p class="policy-text">For privacy questions, data requests, or concerns:</p>
+      <div class="contact-box">
+        <div class="contact-box-title">Privacy Contact</div>
+        <p class="contact-box-desc">We respond to all privacy emails within 7 days.<br/>For urgent deletion requests, mention "URGENT" in your subject line.</p>
+        <div class="contact-box-email">curaahtech@gmail.com</div>
+        <p style="font-size:12px;color:var(--text-on-dark-muted);margin-top:12px;">Subject line: "Privacy Request" · Include your registered phone number</p>
+      </div>
+    </div>
+
+  </div>
+
+  <footer class="footer">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand-name">
+          <svg width="26" height="26" viewBox="0 0 36 36" fill="none">
+            <path d="M18 3 L5 9 L5 21 Q5 30 18 34 Q31 30 31 21 L31 9 Z" fill="#0f1f3d" stroke="#3d9eff" stroke-width="1.5"/>
+            <path d="M18 10 Q13 15 13 20 Q13 25 18 28 Q23 25 23 20 Q23 15 18 10Z" fill="#3d9eff" opacity="0.9"/>
+            <circle cx="18" cy="22" r="3.5" fill="white"/>
+          </svg>curaah
+        </div>
+        <p class="footer-brand-desc">Your health, remembered.</p>
+        <p class="footer-built">A product of <span>Curaah HealthTech Pvt Ltd</span> · Nangal, Punjab 🇮🇳</p>
+      </div>
+      <div>
+        <div class="footer-col-title">Legal</div>
+        <ul class="footer-col-links">
+          <li><a href="privacy.html">Privacy Policy</a></li>
+          <li><a href="terms.html">Terms of Service</a></li>
+          <li><a href="consent.html">Manage Consent</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">Contact</div>
+        <ul class="footer-col-links">
+          <li><a href="mailto:curaahtech@gmail.com">curaahtech@gmail.com</a></li>
+          <li><a href="#">Nangal, Punjab 140124</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-bottom-text">© 2026 Curaah HealthTech Pvt Ltd. All rights reserved.</p>
+      <div class="footer-bottom-links">
+        <a href="privacy.html">Privacy</a>
+        <a href="terms.html">Terms</a>
+        <a href="delete-account.html">Delete My Data</a>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
