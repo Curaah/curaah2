@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Companion — Curaah</title>
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg" />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    body { background: var(--off-white); min-height: 100vh; overflow: hidden; }
+    .dashboard-layout { display: flex; min-height: 100vh; padding-top: var(--nav-height); }
+
+    .sidebar {
+      width: 252px; flex-shrink: 0; background: var(--navy);
+      border-right: 1px solid var(--border-dark);
+      position: fixed; top: var(--nav-height); left: 0; bottom: 0;
+      display: flex; flex-direction: column; overflow-y: auto; z-index: 90;
+    }
+    .sidebar-profile { padding: 22px 18px; border-bottom: 1px solid var(--border-dark); display: flex; align-items: center; gap: 12px; }
+    .sidebar-avatar {
+      width: 42px; height: 42px; border-radius: 50%;
+      background: rgba(61,158,255,0.15); border: 2px solid var(--electric);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; font-weight: 700; color: var(--electric); flex-shrink: 0;
+    }
+    .sidebar-profile-name { font-size: 14px; font-weight: 600; color: var(--white); margin-bottom: 2px; }
+    .sidebar-profile-tag  { font-size: 11px; color: var(--text-on-dark-muted); }
+    .sidebar-nav { padding: 14px 10px; flex: 1; display: flex; flex-direction: column; gap: 2px; }
+    .sidebar-section-label { font-size: 10px; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase; color: rgba(255,255,255,0.25); padding: 12px 8px 6px; }
+    .sidebar-item {
+      display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+      border-radius: var(--radius-md); font-size: 13.5px; font-weight: 500;
+      color: var(--text-on-dark-muted); cursor: pointer; transition: var(--transition);
+      border: none; background: none; width: 100%; text-align: left; text-decoration: none;
+    }
+    .sidebar-item:hover  { background: rgba(255,255,255,0.06); color: var(--white); }
+    .sidebar-item.active { background: rgba(61,158,255,0.12); color: var(--electric); font-weight: 600; }
+    .sidebar-item-icon   { font-size: 16px; width: 20px; text-align: center; flex-shrink: 0; }
+    .sidebar-sos-box { margin: 12px 10px; padding: 14px; background: rgba(255,71,87,0.1); border: 1px solid rgba(255,71,87,0.25); border-radius: var(--radius-md); text-align: center; }
+    .sidebar-sos-box button { width: 100%; background: var(--danger); color: white; font-weight: 700; font-size: 13px; padding: 10px; border-radius: var(--radius-md); }
+    .sidebar-bottom { padding: 14px 10px; border-top: 1px solid var(--border-dark); }
+
+    /* ── CHAT LAYOUT ── */
+    .chat-main { margin-left: 252px; flex: 1; display: flex; flex-direction: column; height: calc(100vh - var(--nav-height)); }
+
+    .chat-header { padding: 16px 28px; border-bottom: 1px solid var(--border-card); background: var(--white); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+    .chat-header-left { display: flex; align-items: center; gap: 12px; }
+    .chat-header-avatar { width: 38px; height: 38px; border-radius: 50%; background: var(--navy); display: flex; align-items: center; justify-content: center; font-size: 18px; }
+    .chat-header-title { font-size: 15px; font-weight: 700; color: var(--text-primary); }
+    .chat-header-sub { font-size: 11.5px; color: var(--text-muted); }
+
+    .lang-switch { display: flex; gap: 4px; background: var(--off-white); border-radius: var(--radius-full); padding: 3px; }
+    .lang-switch button {
+      font-size: 11.5px; font-weight: 600; padding: 5px 12px; border-radius: var(--radius-full);
+      color: var(--text-muted); transition: var(--transition);
+    }
+    .lang-switch button.active { background: var(--electric); color: white; }
+
+    .chat-scroll { flex: 1; overflow-y: auto; padding: 24px 28px; display: flex; flex-direction: column; }
+    .chat-scroll-inner { max-width: 760px; margin: 0 auto; width: 100%; }
+
+    .chat-welcome { text-align: center; padding: 30px 16px; }
+    .chat-welcome-icon { font-size: 44px; margin-bottom: 14px; }
+    .chat-welcome-title { font-family: 'Georgia', serif; font-size: 21px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; }
+    .chat-welcome-desc { font-size: 13.5px; color: var(--text-muted); max-width: 420px; margin: 0 auto 22px; line-height: 1.7; }
+
+    .suggested-questions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+    .suggested-q-chip {
+      font-size: 12.5px; padding: 9px 16px; border-radius: var(--radius-full);
+      background: var(--white); border: 1.5px solid var(--border-card); color: var(--text-secondary);
+      cursor: pointer; transition: var(--transition);
+    }
+    .suggested-q-chip:hover { border-color: var(--electric); color: var(--electric); }
+
+    .chat-input-bar { padding: 16px 28px 22px; background: var(--white); border-top: 1px solid var(--border-card); }
+    .chat-input-inner { max-width: 760px; margin: 0 auto; display: flex; gap: 10px; align-items: flex-end; }
+    .chat-input-box {
+      flex: 1; display: flex; align-items: flex-end; gap: 8px;
+      background: var(--off-white); border: 1.5px solid var(--border-card); border-radius: var(--radius-lg);
+      padding: 10px 12px;
+    }
+    .chat-input-box:focus-within { border-color: var(--electric); }
+    .chat-textarea {
+      flex: 1; border: none; background: none; resize: none; font-family: inherit;
+      font-size: 14px; max-height: 120px; padding: 6px 4px; line-height: 1.5;
+    }
+    .chat-textarea:focus { outline: none; }
+    .chat-input-icon-btn {
+      width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; font-size: 17px;
+      color: var(--text-muted); transition: var(--transition);
+    }
+    .chat-input-icon-btn:hover { background: rgba(61,158,255,0.08); color: var(--electric); }
+    .chat-send-btn {
+      width: 44px; height: 44px; border-radius: 50%; background: var(--electric); color: white;
+      font-size: 18px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+      transition: var(--transition); box-shadow: 0 4px 12px rgba(61,158,255,0.3);
+    }
+    .chat-send-btn:hover { background: var(--electric-light); }
+    .chat-send-btn:disabled { opacity: 0.4; box-shadow: none; }
+
+    #photoInput { display: none; }
+    .chat-photo-preview {
+      display: none; max-width: 760px; margin: 0 auto 10px; background: var(--off-white);
+      border-radius: var(--radius-md); padding: 10px 14px; align-items: center; gap: 10px;
+    }
+    .chat-photo-preview.show { display: flex; }
+    .chat-photo-preview img { width: 44px; height: 44px; border-radius: var(--radius-sm); object-fit: cover; }
+
+    @media (max-width: 860px) {
+      .sidebar { transform: translateX(-252px); transition: transform 0.3s; }
+      .sidebar.open { transform: translateX(0); }
+      .chat-main { margin-left: 0; }
+      .chat-header, .chat-input-bar, .chat-scroll { padding-left: 16px; padding-right: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <a href="index.html" class="nav-logo">
+      <svg class="nav-logo-icon" viewBox="0 0 36 36" fill="none">
+        <path d="M18 3 L5 9 L5 21 Q5 30 18 34 Q31 30 31 21 L31 9 Z" fill="#0f1f3d" stroke="#3d9eff" stroke-width="1.5"/>
+        <path d="M18 10 Q13 15 13 20 Q13 25 18 28 Q23 25 23 20 Q23 15 18 10Z" fill="#3d9eff" opacity="0.9"/>
+        <circle cx="18" cy="22" r="3.5" fill="white"/>
+      </svg>
+      <div class="nav-logo-text"><span class="nav-logo-name">curaah</span><span class="nav-logo-tag">AI Health Companion</span></div>
+    </a>
+    <div class="nav-actions">
+      <span style="font-size:13px;color:var(--text-on-dark-muted);">Hi, <strong style="color:var(--white);" id="navName">—</strong></span>
+      <button class="btn btn-ghost btn-sm" onclick="handleLogout()">Logout</button>
+    </div>
+    <div class="nav-hamburger" id="hamburger" onclick="toggleSidebar()"><span></span><span></span><span></span></div>
+  </nav>
+
+  <div class="dashboard-layout">
+
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-profile">
+        <div class="sidebar-avatar" id="sidebarAvatar">—</div>
+        <div><div class="sidebar-profile-name" id="sidebarName">Loading...</div><div class="sidebar-profile-tag" id="sidebarCity">—</div></div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="sidebar-section-label">Main</div>
+        <a class="sidebar-item" href="dashboard.html"><span class="sidebar-item-icon">🏠</span> Dashboard</a>
+        <a class="sidebar-item" href="prescriptions.html"><span class="sidebar-item-icon">📋</span> Prescriptions</a>
+        <a class="sidebar-item" href="medicines.html"><span class="sidebar-item-icon">💊</span> My Medicines</a>
+        <a class="sidebar-item" href="adherence.html"><span class="sidebar-item-icon">📅</span> Adherence Log</a>
+        <a class="sidebar-item" href="lab-reports.html"><span class="sidebar-item-icon">📊</span> Lab Reports</a>
+        <a class="sidebar-item active" href="ai-companion.html"><span class="sidebar-item-icon">🤖</span> AI Companion</a>
+        <div class="sidebar-section-label">Family & Safety</div>
+        <a class="sidebar-item" href="family.html"><span class="sidebar-item-icon">👨‍👩‍👧</span> Family Dashboard</a>
+        <a class="sidebar-item" href="recovery-score.html"><span class="sidebar-item-icon">📈</span> Recovery Score</a>
+        <div class="sidebar-section-label">Account</div>
+        <a class="sidebar-item" href="consent.html"><span class="sidebar-item-icon">🔒</span> Privacy & Consent</a>
+        <a class="sidebar-item" href="profile.html"><span class="sidebar-item-icon">👤</span> My Profile</a>
+      </nav>
+      <div class="sidebar-sos-box">
+        <div style="font-size:11px;color:var(--text-on-dark-muted);margin-bottom:8px;">In an emergency</div>
+        <button onclick="window.location.href='sos.html'">🚨 SOS</button>
+      </div>
+      <div class="sidebar-bottom">
+        <button class="sidebar-item" onclick="handleLogout()" style="color:var(--danger);"><span class="sidebar-item-icon">🚪</span> Logout</button>
+      </div>
+    </aside>
+
+    <main class="chat-main">
+
+      <div class="chat-header">
+        <div class="chat-header-left">
+          <div class="chat-header-avatar">🤖</div>
+          <div>
+            <div class="chat-header-title">Curaah Companion</div>
+            <div class="chat-header-sub" id="contextSub">Knows your medicines, conditions & history</div>
+          </div>
+        </div>
+        <div class="lang-switch" id="langSwitch">
+          <button data-lang="hindi" onclick="switchLang('hindi')">हिन्दी</button>
+          <button data-lang="punjabi" onclick="switchLang('punjabi')">ਪੰਜਾਬੀ</button>
+          <button data-lang="english" onclick="switchLang('english')">English</button>
+        </div>
+      </div>
+
+      <div class="chat-scroll" id="chatScroll">
+        <div class="chat-scroll-inner" id="chatInner">
+
+          <div class="chat-welcome" id="chatWelcome">
+            <div class="chat-welcome-icon">🤖</div>
+            <div class="chat-welcome-title">Ask me anything about your health</div>
+            <div class="chat-welcome-desc">
+              I already know your medicines and conditions — no need to explain from scratch.
+              Ask about food, symptoms, supplements, or upload a photo to check.
+            </div>
+            <div class="suggested-questions" id="suggestedQuestions"></div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="chat-photo-preview" id="photoPreview">
+        <img id="photoPreviewImg" />
+        <span style="flex:1;font-size:12.5px;color:var(--text-secondary);" id="photoPreviewName">photo.jpg</span>
+        <button class="btn btn-ghost btn-sm" onclick="removePhoto()">✕</button>
+      </div>
+
+      <div class="chat-input-bar">
+        <div class="chat-input-inner">
+          <button class="chat-input-icon-btn" onclick="document.getElementById('photoInput').click()" title="Attach photo">📷</button>
+          <input type="file" id="photoInput" accept="image/*" />
+          <div class="chat-input-box">
+            <textarea class="chat-textarea" id="chatTextarea" placeholder="Type your question... (e.g. Can I eat Chinese food today?)" rows="1"></textarea>
+          </div>
+          <button class="chat-send-btn" id="sendBtn" onclick="sendMessage()">↑</button>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script src="js/main.js"></script>
+  <script type="module">
+    import { supabase, requireAuth, signOutUser } from './js/supabase.js';
+
+    let currentUser = null;
+    let healthContext = null;
+    let sessionId = crypto.randomUUID();
+    let attachedPhoto = null;
+    let currentLang = 'hindi';
+
+    const suggestions = {
+      hindi: [
+        'क्या मैं आज चाइनीज खाना खा सकता हूं?',
+        'मेरा रिकवरी स्कोर क्यों कम हुआ?',
+        'यह सप्लीमेंट सही है? (फोटो भेजें)',
+        'मुझे सिरदर्द है, क्या करूं?',
+      ],
+      punjabi: [
+        'ਕੀ ਮੈਂ ਅੱਜ ਚਾਈਨੀਜ਼ ਖਾਣਾ ਖਾ ਸਕਦਾ ਹਾਂ?',
+        'ਮੇਰਾ ਰਿਕਵਰੀ ਸਕੋਰ ਕਿਉਂ ਘਟਿਆ?',
+        'ਇਹ ਸਪਲੀਮੈਂਟ ਠੀਕ ਹੈ? (ਫੋਟੋ ਭੇਜੋ)',
+        'ਮੈਨੂੰ ਸਿਰ ਦਰਦ ਹੈ, ਕੀ ਕਰਾਂ?',
+      ],
+      english: [
+        'Can I eat Chinese food today?',
+        'Why did my recovery score drop?',
+        'Is this supplement safe? (send a photo)',
+        'I have a headache, what should I do?',
+      ],
+    };
+
+    async function init() {
+      const session = await requireAuth('login.html');
+      if (!session) return;
+
+      const { data: profile } = await supabase.from('users').select('*').eq('id', session.user.id).single();
+      if (!profile) return;
+
+      currentUser = profile;
+      currentLang = profile.preferred_language || 'hindi';
+      setPreferredLanguage(currentLang);
+      updateLangSwitchUI();
+
+      document.getElementById('navName').textContent       = (profile.full_name || '').split(' ')[0] || '—';
+      document.getElementById('sidebarName').textContent   = profile.full_name || '—';
+      document.getElementById('sidebarAvatar').textContent = getInitials(profile.full_name);
+      document.getElementById('sidebarCity').textContent   = profile.city || 'India';
+
+      renderSuggestions();
+      await buildHealthContext();
+      await loadConversationHistory();
+    }
+
+    window.switchLang = function (lang) {
+      currentLang = lang;
+      setPreferredLanguage(lang);
+      updateLangSwitchUI();
+      renderSuggestions();
+    };
+
+    function updateLangSwitchUI() {
+      document.querySelectorAll('#langSwitch button').forEach(b => {
+        b.classList.toggle('active', b.dataset.lang === currentLang);
+      });
+    }
+
+    function renderSuggestions() {
+      const wrap = document.getElementById('suggestedQuestions');
+      wrap.innerHTML = (suggestions[currentLang] || suggestions.hindi)
+        .map(q => `<div class="suggested-q-chip" onclick="askSuggested('${q.replace(/'/g, "\\'")}')">${q}</div>`)
+        .join('');
+    }
+
+    window.askSuggested = function (text) {
+      document.getElementById('chatTextarea').value = text;
+      sendMessage();
+    };
+
+    // Build a snapshot of the patient's health context — used in every AI call,
+    // and stored alongside each message for compliance auditing.
+    async function buildHealthContext() {
+      const [profileRes, medsRes, recentLogsRes, scoreRes] = await Promise.all([
+        supabase.from('health_profiles').select('*').eq('user_id', currentUser.id).single(),
+        supabase.from('medicines').select('name, salt_composition, timing').eq('user_id', currentUser.id).eq('is_active', true),
+        supabase.from('adherence_logs').select('status, scheduled_date').eq('user_id', currentUser.id).order('scheduled_date', { ascending: false }).limit(7),
+        supabase.from('recovery_scores').select('overall_score').eq('user_id', currentUser.id).order('score_date', { ascending: false }).limit(1).single(),
+      ]);
+
+      healthContext = {
+        name: currentUser.full_name,
+        age: currentUser.date_of_birth ? Math.floor((Date.now() - new Date(currentUser.date_of_birth)) / 31557600000) : null,
+        gender: currentUser.gender,
+        conditions: profileRes.data?.conditions || [],
+        allergies: profileRes.data?.allergies || [],
+        medicines: (medsRes.data || []).map(m => ({ name: m.name, salt: m.salt_composition, timing: m.timing })),
+        recent_adherence: recentLogsRes.data || [],
+        recovery_score: scoreRes.data?.overall_score || null,
+        language: currentLang,
+      };
+
+      document.getElementById('contextSub').textContent =
+        healthContext.medicines.length
+          ? `Knows ${healthContext.medicines.length} medicine${healthContext.medicines.length > 1 ? 's' : ''} & your history`
+          : 'Knows your profile & history';
+    }
+
+    async function loadConversationHistory() {
+      const { data } = await supabase
+        .from('ai_conversations')
+        .select('*')
+        .eq('user_id', currentUser.id)
+        .order('created_at', { ascending: true })
+        .limit(20);
+
+      if (data && data.length) {
+        document.getElementById('chatWelcome').style.display = 'none';
+        data.forEach(msg => renderMessage(msg.message_role, msg.message_text, false));
+        scrollToBottom();
+      }
+    }
+
+    document.getElementById('photoInput').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      attachedPhoto = file;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        document.getElementById('photoPreviewImg').src = ev.target.result;
+        document.getElementById('photoPreviewName').textContent = file.name;
+        document.getElementById('photoPreview').classList.add('show');
+      };
+      reader.readAsDataURL(file);
+    });
+
+    window.removePhoto = function () {
+      attachedPhoto = null;
+      document.getElementById('photoInput').value = '';
+      document.getElementById('photoPreview').classList.remove('show');
+    };
+
+    const textarea = document.getElementById('chatTextarea');
+    textarea.addEventListener('input', () => {
+      textarea.style.height = 'auto';
+      textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
+    });
+    textarea.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+
+    function renderMessage(role, text, animate = true) {
+      const inner = document.getElementById('chatInner');
+      const bubble = document.createElement('div');
+      bubble.className = `chat-bubble ${role === 'user' ? 'user' : 'assistant'}`;
+      bubble.style.opacity = animate ? '0' : '1';
+      bubble.innerHTML = text;
+      inner.appendChild(bubble);
+      if (animate) requestAnimationFrame(() => { bubble.style.transition = 'opacity 0.3s'; bubble.style.opacity = '1'; });
+      return bubble;
+    }
+
+    function renderTyping() {
+      const inner = document.getElementById('chatInner');
+      const wrap = document.createElement('div');
+      wrap.className = 'chat-bubble assistant';
+      wrap.id = 'typingBubble';
+      wrap.innerHTML = `<div class="chat-typing"><span></span><span></span><span></span></div>`;
+      inner.appendChild(wrap);
+      scrollToBottom();
+      return wrap;
+    }
+
+    function scrollToBottom() {
+      const scroll = document.getElementById('chatScroll');
+      scroll.scrollTop = scroll.scrollHeight;
+    }
+
+    window.sendMessage = async function () {
+      const text = textarea.value.trim();
+      if (!text && !attachedPhoto) return;
+
+      document.getElementById('chatWelcome').style.display = 'none';
+
+      const sendBtn = document.getElementById('sendBtn');
+      sendBtn.disabled = true;
+
+      // Render user message (with photo thumbnail if attached)
+      let userHtml = text ? escapeHtml(text) : '';
+      if (attachedPhoto) {
+        userHtml += `<br/><img src="${document.getElementById('photoPreviewImg').src}" style="max-width:160px;border-radius:8px;margin-top:6px;" />`;
+      }
+      renderMessage('user', userHtml);
+      scrollToBottom();
+
+      const photoToSend = attachedPhoto;
+      textarea.value = '';
+      textarea.style.height = 'auto';
+      removePhoto();
+
+      // Save user message to DB
+      await supabase.from('ai_conversations').insert({
+        user_id: currentUser.id,
+        session_id: sessionId,
+        message_role: 'user',
+        message_text: text || '[Photo attached]',
+        message_language: currentLang,
+        channel: 'app',
+      });
+
+      const typingEl = renderTyping();
+
+      try {
+        let photoUrl = null;
+        if (photoToSend) {
+          const path = `${currentUser.id}/chat_${Date.now()}.${photoToSend.name.split('.').pop()}`;
+          await supabase.storage.from('avatars').upload(path, photoToSend).catch(() => {});
+          const { data } = await supabase.storage.from('avatars').createSignedUrl(path, 60 * 60 * 24);
+          photoUrl = data?.signedUrl;
+        }
+
+        let aiReply = null;
+        try {
+          const { data, error } = await supabase.functions.invoke('proxy-llm', {
+            body: {
+              message: text,
+              photo_url: photoUrl,
+              health_context: healthContext,
+              language: currentLang,
+              session_id: sessionId,
+            },
+          });
+          if (!error) aiReply = data?.reply;
+        } catch (_) { /* edge function not yet configured */ }
+
+        typingEl.remove();
+
+        const fallbackMsg = {
+          hindi: 'Curaah अभी पूरी तरह तैयार हो रहा है — AI सेवाएं जल्द ही जुड़ जाएंगी। तब तक के लिए धन्यवाद!',
+          punjabi: 'Curaah ਹਾਲੇ ਪੂਰੀ ਤਰ੍ਹਾਂ ਤਿਆਰ ਹੋ ਰਿਹਾ ਹੈ — AI ਸੇਵਾਵਾਂ ਜਲਦੀ ਜੁੜ ਜਾਣਗੀਆਂ।',
+          english: 'Curaah is still being fully set up — AI services will be connected shortly. Thanks for your patience!',
+        };
+
+        const replyText = aiReply || fallbackMsg[currentLang] || fallbackMsg.hindi;
+        const replyHtml = escapeHtml(replyText) + renderAiDisclaimer(currentLang);
+
+        renderMessage('assistant', replyHtml);
+        scrollToBottom();
+
+        await supabase.from('ai_conversations').insert({
+          user_id: currentUser.id,
+          session_id: sessionId,
+          message_role: 'assistant',
+          message_text: replyText,
+          message_language: currentLang,
+          ai_provider: aiReply ? 'claude' : null,
+          context_snapshot: healthContext,
+          disclaimer_shown: true,
+          channel: 'app',
+        });
+
+      } catch (err) {
+        typingEl.remove();
+        renderMessage('assistant', 'Sorry, something went wrong. Please try again.');
+      }
+
+      sendBtn.disabled = false;
+    };
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    window.handleLogout = async function () {
+      await signOutUser();
+      showToast('Logged out.', 'success');
+      setTimeout(() => { window.location.href = 'index.html'; }, 600);
+    };
+
+    init();
+  </script>
+
+</body>
+</html>
