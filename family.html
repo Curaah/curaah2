@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Family Dashboard — Curaah</title>
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg" />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    body { background: var(--off-white); min-height: 100vh; }
+    .dashboard-layout { display: flex; min-height: 100vh; padding-top: var(--nav-height); }
+
+    .sidebar {
+      width: 252px; flex-shrink: 0; background: var(--navy);
+      border-right: 1px solid var(--border-dark);
+      position: fixed; top: var(--nav-height); left: 0; bottom: 0;
+      display: flex; flex-direction: column; overflow-y: auto; z-index: 90;
+    }
+    .sidebar-profile { padding: 22px 18px; border-bottom: 1px solid var(--border-dark); display: flex; align-items: center; gap: 12px; }
+    .sidebar-avatar {
+      width: 42px; height: 42px; border-radius: 50%;
+      background: rgba(61,158,255,0.15); border: 2px solid var(--electric);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; font-weight: 700; color: var(--electric); flex-shrink: 0;
+    }
+    .sidebar-profile-name { font-size: 14px; font-weight: 600; color: var(--white); margin-bottom: 2px; }
+    .sidebar-profile-tag  { font-size: 11px; color: var(--text-on-dark-muted); }
+    .sidebar-nav { padding: 14px 10px; flex: 1; display: flex; flex-direction: column; gap: 2px; }
+    .sidebar-section-label { font-size: 10px; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase; color: rgba(255,255,255,0.25); padding: 12px 8px 6px; }
+    .sidebar-item {
+      display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+      border-radius: var(--radius-md); font-size: 13.5px; font-weight: 500;
+      color: var(--text-on-dark-muted); cursor: pointer; transition: var(--transition);
+      border: none; background: none; width: 100%; text-align: left; text-decoration: none;
+    }
+    .sidebar-item:hover  { background: rgba(255,255,255,0.06); color: var(--white); }
+    .sidebar-item.active { background: rgba(61,158,255,0.12); color: var(--electric); font-weight: 600; }
+    .sidebar-item-icon   { font-size: 16px; width: 20px; text-align: center; flex-shrink: 0; }
+    .sidebar-sos-box { margin: 12px 10px; padding: 14px; background: rgba(255,71,87,0.1); border: 1px solid rgba(255,71,87,0.25); border-radius: var(--radius-md); text-align: center; }
+    .sidebar-sos-box button { width: 100%; background: var(--danger); color: white; font-weight: 700; font-size: 13px; padding: 10px; border-radius: var(--radius-md); }
+    .sidebar-bottom { padding: 14px 10px; border-top: 1px solid var(--border-dark); }
+
+    .dashboard-main { margin-left: 252px; flex: 1; padding: 30px 36px 60px; }
+    .dash-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 22px; flex-wrap: wrap; gap: 16px; }
+    .dash-greeting { font-size: 13px; color: var(--text-muted); margin-bottom: 4px; }
+    .dash-title    { font-family: 'Georgia', serif; font-size: 25px; font-weight: 700; color: var(--text-primary); }
+
+    /* Mode tabs */
+    .mode-tabs { display: flex; gap: 0; background: var(--white); border: 1px solid var(--border-card); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 24px; max-width: 480px; }
+    .mode-tab { flex: 1; padding: 11px 18px; font-size: 13px; font-weight: 600; color: var(--text-muted); cursor: pointer; transition: var(--transition); border: none; background: none; }
+    .mode-tab.active { background: var(--electric); color: white; }
+
+    /* ── INVITE PANEL ── */
+    .invite-panel { background: var(--white); border: 1px solid var(--border-card); border-radius: var(--radius-xl); padding: 24px; margin-bottom: 22px; }
+    .invite-panel-title { font-size: 15px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
+    .invite-panel-desc  { font-size: 12.5px; color: var(--text-muted); margin-bottom: 18px; line-height: 1.6; }
+    .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+    .access-level-options { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
+    .access-option {
+      border: 1.5px solid var(--border-card); border-radius: var(--radius-md);
+      padding: 12px 10px; text-align: center; cursor: pointer; transition: var(--transition);
+    }
+    .access-option.selected { border-color: var(--electric); background: rgba(61,158,255,0.05); }
+    .access-option-label { font-size: 12.5px; font-weight: 700; color: var(--text-primary); }
+    .access-option-desc  { font-size: 10.5px; color: var(--text-muted); margin-top: 2px; line-height: 1.4; }
+
+    .permission-toggles { display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px; }
+    .permission-toggle-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 14px; background: var(--off-white); border-radius: var(--radius-md);
+    }
+    .permission-toggle-label { font-size: 12.5px; font-weight: 600; color: var(--text-primary); }
+    .toggle-switch { position: relative; width: 40px; height: 22px; flex-shrink: 0; }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider {
+      position: absolute; cursor: pointer; inset: 0;
+      background: var(--border-card); border-radius: var(--radius-full); transition: var(--transition);
+    }
+    .toggle-slider::before {
+      content: ''; position: absolute; height: 16px; width: 16px; left: 3px; bottom: 3px;
+      background: white; border-radius: 50%; transition: var(--transition);
+    }
+    .toggle-switch input:checked + .toggle-slider { background: var(--electric); }
+    .toggle-switch input:checked + .toggle-slider::before { transform: translateX(18px); }
+
+    /* ── FAMILY MEMBER LIST ── */
+    .panel { background: var(--white); border: 1px solid var(--border-card); border-radius: var(--radius-lg); overflow: hidden; }
+    .panel-header { padding: 17px 20px; border-bottom: 1px solid var(--border-card); display: flex; align-items: center; justify-content: space-between; }
+    .panel-title { font-size: 14.5px; font-weight: 700; color: var(--text-primary); }
+    .panel-empty { padding: 40px 20px; text-align: center; color: var(--text-muted); font-size: 13.5px; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+    .panel-empty-icon { font-size: 32px; opacity: 0.4; }
+
+    .family-member-row {
+      display: flex; align-items: center; gap: 14px; padding: 16px 20px;
+      border-bottom: 1px solid var(--border-card);
+    }
+    .family-member-row:last-child { border-bottom: none; }
+    .family-member-avatar {
+      width: 42px; height: 42px; border-radius: 50%; background: rgba(61,158,255,0.1);
+      display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700;
+      color: var(--electric); flex-shrink: 0;
+    }
+    .family-member-info { flex: 1; min-width: 0; }
+    .family-member-name { font-size: 13.5px; font-weight: 600; color: var(--text-primary); }
+    .family-member-meta { font-size: 11.5px; color: var(--text-muted); margin-top: 2px; }
+    .family-member-actions { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+
+    /* ── CAREGIVER VIEW (Mode 2) ── */
+    .caregiver-card {
+      background: var(--navy); border-radius: var(--radius-xl); padding: 26px;
+      margin-bottom: 20px;
+    }
+    .caregiver-card-name { font-size: 19px; font-weight: 700; color: var(--white); font-family: 'Georgia', serif; }
+    .caregiver-card-sub { font-size: 12.5px; color: var(--text-on-dark-muted); margin-top: 4px; }
+
+    .caregiver-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 20px; }
+    .caregiver-stat-box { background: rgba(255,255,255,0.06); border-radius: var(--radius-md); padding: 14px; text-align: center; }
+    .caregiver-stat-num { font-family: 'Georgia', serif; font-size: 24px; font-weight: 700; color: var(--white); }
+    .caregiver-stat-label { font-size: 10.5px; color: var(--text-on-dark-muted); margin-top: 2px; }
+
+    @media (max-width: 860px) {
+      .sidebar { transform: translateX(-252px); transition: transform 0.3s; }
+      .sidebar.open { transform: translateX(0); }
+      .dashboard-main { margin-left: 0; padding: 20px; }
+      .form-row-2, .access-level-options { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <a href="index.html" class="nav-logo">
+      <svg class="nav-logo-icon" viewBox="0 0 36 36" fill="none">
+        <path d="M18 3 L5 9 L5 21 Q5 30 18 34 Q31 30 31 21 L31 9 Z" fill="#0f1f3d" stroke="#3d9eff" stroke-width="1.5"/>
+        <path d="M18 10 Q13 15 13 20 Q13 25 18 28 Q23 25 23 20 Q23 15 18 10Z" fill="#3d9eff" opacity="0.9"/>
+        <circle cx="18" cy="22" r="3.5" fill="white"/>
+      </svg>
+      <div class="nav-logo-text"><span class="nav-logo-name">curaah</span><span class="nav-logo-tag">AI Health Companion</span></div>
+    </a>
+    <ul class="nav-links"><li><a href="ai-companion.html">Ask AI</a></li></ul>
+    <div class="nav-actions">
+      <span style="font-size:13px;color:var(--text-on-dark-muted);">Hi, <strong style="color:var(--white);" id="navName">—</strong></span>
+      <button class="btn btn-ghost btn-sm" onclick="handleLogout()">Logout</button>
+    </div>
+    <div class="nav-hamburger" id="hamburger" onclick="toggleSidebar()"><span></span><span></span><span></span></div>
+  </nav>
+
+  <div class="dashboard-layout">
+
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-profile">
+        <div class="sidebar-avatar" id="sidebarAvatar">—</div>
+        <div><div class="sidebar-profile-name" id="sidebarName">Loading...</div><div class="sidebar-profile-tag" id="sidebarCity">—</div></div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="sidebar-section-label">Main</div>
+        <a class="sidebar-item" href="dashboard.html"><span class="sidebar-item-icon">🏠</span> Dashboard</a>
+        <a class="sidebar-item" href="prescriptions.html"><span class="sidebar-item-icon">📋</span> Prescriptions</a>
+        <a class="sidebar-item" href="medicines.html"><span class="sidebar-item-icon">💊</span> My Medicines</a>
+        <a class="sidebar-item" href="adherence.html"><span class="sidebar-item-icon">📅</span> Adherence Log</a>
+        <a class="sidebar-item" href="lab-reports.html"><span class="sidebar-item-icon">📊</span> Lab Reports</a>
+        <a class="sidebar-item" href="ai-companion.html"><span class="sidebar-item-icon">🤖</span> AI Companion</a>
+        <div class="sidebar-section-label">Family & Safety</div>
+        <a class="sidebar-item active" href="family.html"><span class="sidebar-item-icon">👨‍👩‍👧</span> Family Dashboard</a>
+        <a class="sidebar-item" href="recovery-score.html"><span class="sidebar-item-icon">📈</span> Recovery Score</a>
+        <div class="sidebar-section-label">Account</div>
+        <a class="sidebar-item" href="consent.html"><span class="sidebar-item-icon">🔒</span> Privacy & Consent</a>
+        <a class="sidebar-item" href="profile.html"><span class="sidebar-item-icon">👤</span> My Profile</a>
+      </nav>
+      <div class="sidebar-sos-box">
+        <div style="font-size:11px;color:var(--text-on-dark-muted);margin-bottom:8px;">In an emergency</div>
+        <button onclick="window.location.href='sos.html'">🚨 SOS</button>
+      </div>
+      <div class="sidebar-bottom">
+        <button class="sidebar-item" onclick="handleLogout()" style="color:var(--danger);"><span class="sidebar-item-icon">🚪</span> Logout</button>
+      </div>
+    </aside>
+
+    <main class="dashboard-main">
+
+      <div class="dash-header">
+        <div>
+          <div class="dash-greeting">Keep the people who care, informed</div>
+          <div class="dash-title">Family Dashboard</div>
+        </div>
+      </div>
+
+      <div class="mode-tabs">
+        <button class="mode-tab active" id="tabManage" onclick="switchMode('manage')">👨‍👩‍👧 People I've Invited</button>
+        <button class="mode-tab" id="tabCaregiver" onclick="switchMode('caregiver')">👀 Family I'm Watching Over</button>
+      </div>
+
+      <!-- ═══════ MODE 1: MANAGE (Patient inviting family) ═══════ -->
+      <div id="manageMode">
+
+        <div class="invite-panel">
+          <div class="invite-panel-title">+ Invite a Family Member</div>
+          <div class="invite-panel-desc">
+            They'll get a link to create their own Curaah account and accept this invite.
+            You control exactly what they can see, and can change or revoke this anytime.
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label class="form-label">Their Name</label>
+              <input class="form-input" type="text" id="inviteName" placeholder="e.g. Priya (Daughter)" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Relationship</label>
+              <select class="form-input form-select" id="inviteRelationship">
+                <option value="spouse">Spouse</option>
+                <option value="child">Son / Daughter</option>
+                <option value="parent">Parent</option>
+                <option value="sibling">Sibling</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label class="form-label">Their Phone Number</label>
+              <input class="form-input" type="tel" id="invitePhone" placeholder="10-digit number" maxlength="10" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Their Email <span style="color:var(--text-muted);font-weight:400;">(optional)</span></label>
+              <input class="form-input" type="email" id="inviteEmail" placeholder="their@email.com" />
+            </div>
+          </div>
+
+          <label class="form-label" style="margin-bottom:10px;display:block;">Access Level</label>
+          <div class="access-level-options">
+            <div class="access-option selected" data-level="summary" onclick="selectAccessLevel(this,'summary')">
+              <div class="access-option-label">Summary</div>
+              <div class="access-option-desc">Adherence & score only</div>
+            </div>
+            <div class="access-option" data-level="full" onclick="selectAccessLevel(this,'full')">
+              <div class="access-option-label">Full Access</div>
+              <div class="access-option-desc">Everything I allow below</div>
+            </div>
+            <div class="access-option" data-level="emergency_only" onclick="selectAccessLevel(this,'emergency_only')">
+              <div class="access-option-label">Emergency Only</div>
+              <div class="access-option-desc">Only notified on SOS</div>
+            </div>
+          </div>
+
+          <div class="permission-toggles">
+            <div class="permission-toggle-row">
+              <span class="permission-toggle-label">💊 Can view medicines & adherence</span>
+              <label class="toggle-switch"><input type="checkbox" id="permMedicines" checked /><span class="toggle-slider"></span></label>
+            </div>
+            <div class="permission-toggle-row">
+              <span class="permission-toggle-label">📊 Can view lab reports</span>
+              <label class="toggle-switch"><input type="checkbox" id="permLabReports" /><span class="toggle-slider"></span></label>
+            </div>
+            <div class="permission-toggle-row">
+              <span class="permission-toggle-label">🚨 Receives emergency / SOS alerts</span>
+              <label class="toggle-switch"><input type="checkbox" id="permAlerts" checked /><span class="toggle-slider"></span></label>
+            </div>
+          </div>
+
+          <button class="btn btn-primary btn-lg" id="sendInviteBtn" onclick="sendInvite()">Send Invitation</button>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header"><div class="panel-title">👨‍👩‍👧 People With Access to My Health</div></div>
+          <div id="familyMembersList">
+            <div class="panel-empty">
+              <div class="panel-empty-icon">👨‍👩‍👧</div>
+              <div>Loading...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════ MODE 2: CAREGIVER (Viewing a family member's data) ═══════ -->
+      <div id="caregiverMode" style="display:none;">
+        <div id="caregiverList">
+          <div class="panel-empty">
+            <div class="panel-empty-icon">👀</div>
+            <div>Loading...</div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script src="js/main.js"></script>
+  <script type="module">
+    import { supabase, requireAuth, signOutUser } from './js/supabase.js';
+
+    let currentUser = null;
+    let selectedAccessLevel = 'summary';
+
+    async function init() {
+      const session = await requireAuth('login.html');
+      if (!session) return;
+
+      const { data: profile } = await supabase.from('users').select('*').eq('id', session.user.id).single();
+      if (!profile) return;
+
+      currentUser = profile;
+      document.getElementById('navName').textContent       = (profile.full_name || '').split(' ')[0] || '—';
+      document.getElementById('sidebarName').textContent   = profile.full_name || '—';
+      document.getElementById('sidebarAvatar').textContent = getInitials(profile.full_name);
+      document.getElementById('sidebarCity').textContent   = profile.city || 'India';
+
+      await loadFamilyMembers();
+      await loadCaregiverView();
+    }
+
+    window.switchMode = function (mode) {
+      document.getElementById('manageMode').style.display    = mode === 'manage' ? 'block' : 'none';
+      document.getElementById('caregiverMode').style.display  = mode === 'caregiver' ? 'block' : 'none';
+      document.getElementById('tabManage').classList.toggle('active', mode === 'manage');
+      document.getElementById('tabCaregiver').classList.toggle('active', mode === 'caregiver');
+    };
+
+    window.selectAccessLevel = function (el, level) {
+      document.querySelectorAll('.access-option').forEach(o => o.classList.remove('selected'));
+      el.classList.add('selected');
+      selectedAccessLevel = level;
+    };
+
+    window.sendInvite = async function () {
+      const name = document.getElementById('inviteName').value.trim();
+      const relationship = document.getElementById('inviteRelationship').value;
+      const phone = document.getElementById('invitePhone').value.trim();
+      const email = document.getElementById('inviteEmail').value.trim();
+
+      if (!name) { showToast('Please enter their name.', 'error'); return; }
+      if (phone && !isValidPhone(phone)) { showToast('Enter a valid 10-digit phone number.', 'error'); return; }
+      if (!phone && !email) { showToast('Please provide a phone number or email to invite them.', 'error'); return; }
+
+      const btn = document.getElementById('sendInviteBtn');
+      btn.textContent = 'Sending...';
+      btn.disabled = true;
+
+      try {
+        const canViewMedicines = document.getElementById('permMedicines').checked;
+        const canViewLabReports = document.getElementById('permLabReports').checked;
+        const canReceiveAlerts = document.getElementById('permAlerts').checked;
+
+        const { data, error } = await supabase.from('family_members').insert({
+          patient_user_id: currentUser.id,
+          relationship,
+          invite_phone: phone || null,
+          invite_email: email || null,
+          access_level: selectedAccessLevel,
+          can_view_medicines: canViewMedicines,
+          can_view_lab_reports: canViewLabReports,
+          can_receive_alerts: canReceiveAlerts,
+        }).select().single();
+
+        if (error) throw new Error(error.message);
+
+        const inviteLink = `${window.location.origin}/family-accept.html?token=${data.invite_token}`;
+
+        showToast('Invitation created! Share the link below with them.', 'success');
+
+        // Show the shareable link in a simple prompt-style display
+        const shareMsg = `Invite link for ${name}:\n\n${inviteLink}\n\n(Copied to clipboard)`;
+        try {
+          await navigator.clipboard.writeText(inviteLink);
+        } catch (_) { /* clipboard API may be unavailable */ }
+        alert(shareMsg);
+
+        // Reset form
+        document.getElementById('inviteName').value = '';
+        document.getElementById('invitePhone').value = '';
+        document.getElementById('inviteEmail').value = '';
+
+        await loadFamilyMembers();
+
+      } catch (err) {
+        showToast(err.message || 'Could not send invitation.', 'error');
+      }
+
+      btn.textContent = 'Send Invitation';
+      btn.disabled = false;
+    };
+
+    async function loadFamilyMembers() {
+      const { data } = await supabase
+        .from('family_members')
+        .select('*')
+        .eq('patient_user_id', currentUser.id)
+        .order('invited_at', { ascending: false });
+
+      const el = document.getElementById('familyMembersList');
+
+      if (!data || !data.length) {
+        el.innerHTML = `
+          <div class="panel-empty">
+            <div class="panel-empty-icon">👨‍👩‍👧</div>
+            <div>You haven't invited anyone yet. Use the form above to add a family member.</div>
+          </div>`;
+        return;
+      }
+
+      el.innerHTML = data.map(fm => {
+        const initials = getInitials(fm.invite_phone || fm.invite_email || '?');
+        const statusBadge = fm.is_active
+          ? '<span class="badge badge-green">Active</span>'
+          : fm.revoked_at
+            ? '<span class="badge badge-red">Revoked</span>'
+            : '<span class="badge badge-orange">Pending</span>';
+
+        return `
+          <div class="family-member-row">
+            <div class="family-member-avatar">${initials}</div>
+            <div class="family-member-info">
+              <div class="family-member-name">${fm.relationship ? fm.relationship.charAt(0).toUpperCase() + fm.relationship.slice(1) : 'Family Member'}</div>
+              <div class="family-member-meta">${fm.invite_phone || fm.invite_email || '—'} · ${fm.access_level.replace('_',' ')} access</div>
+            </div>
+            ${statusBadge}
+            <div class="family-member-actions">
+              ${fm.is_active ? `<button class="btn btn-secondary btn-sm" onclick="revokeAccess('${fm.id}')">Revoke</button>` : ''}
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    window.revokeAccess = async function (familyMemberId) {
+      const confirmed = confirm('Are you sure you want to revoke this family member\'s access? They will no longer be able to see your health data.');
+      if (!confirmed) return;
+
+      const { error } = await supabase
+        .from('family_members')
+        .update({ is_active: false, revoked_at: new Date().toISOString(), revoke_reason: 'Revoked by patient' })
+        .eq('id', familyMemberId)
+        .eq('patient_user_id', currentUser.id);
+
+      if (error) {
+        showToast('Could not revoke access. Please try again.', 'error');
+        return;
+      }
+
+      showToast('Access revoked successfully.', 'success');
+      await loadFamilyMembers();
+    };
+
+    // ── Caregiver mode: see patients who've given ME access ──
+    async function loadCaregiverView() {
+      const { data } = await supabase
+        .from('family_members')
+        .select('*, patient:patient_user_id(full_name, city)')
+        .eq('family_user_id', currentUser.id)
+        .eq('is_active', true);
+
+      const el = document.getElementById('caregiverList');
+
+      if (!data || !data.length) {
+        el.innerHTML = `
+          <div class="panel-empty">
+            <div class="panel-empty-icon">👀</div>
+            <div>No one has given you access to their health data yet. When a family member invites you and you accept, they'll appear here.</div>
+          </div>`;
+        return;
+      }
+
+      const cards = await Promise.all(data.map(async (fm) => {
+        const { data: summary } = await supabase.rpc('get_family_dashboard', {
+          p_patient_id: fm.patient_user_id,
+          p_family_id: currentUser.id,
+        });
+
+        const adherence = summary?.today_adherence;
+        const score = summary?.recovery_score;
+
+        return `
+          <div class="caregiver-card">
+            <div class="caregiver-card-name">${fm.patient?.full_name || 'Family Member'}</div>
+            <div class="caregiver-card-sub">${fm.patient?.city || ''} · You have ${fm.access_level.replace('_',' ')} access</div>
+            <div class="caregiver-stats">
+              <div class="caregiver-stat-box">
+                <div class="caregiver-stat-num">${adherence ? `${adherence.taken}/${adherence.total}` : '—'}</div>
+                <div class="caregiver-stat-label">Medicines Today</div>
+              </div>
+              <div class="caregiver-stat-box">
+                <div class="caregiver-stat-num">${score != null ? Math.round(score) : '—'}</div>
+                <div class="caregiver-stat-label">Recovery Score</div>
+              </div>
+              <div class="caregiver-stat-box">
+                <div class="caregiver-stat-num">${fm.can_receive_alerts ? '🔔 On' : '🔕 Off'}</div>
+                <div class="caregiver-stat-label">SOS Alerts</div>
+              </div>
+            </div>
+          </div>`;
+      }));
+
+      el.innerHTML = cards.join('');
+    }
+
+    window.handleLogout = async function () {
+      await signOutUser();
+      showToast('Logged out.', 'success');
+      setTimeout(() => { window.location.href = 'index.html'; }, 600);
+    };
+
+    init();
+  </script>
+
+</body>
+</html>
