@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Dashboard — Curaah</title>
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg" />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    body { background: var(--off-white); min-height: 100vh; }
+
+    .dashboard-layout { display: flex; min-height: 100vh; padding-top: var(--nav-height); }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      width: 252px; flex-shrink: 0; background: var(--navy);
+      border-right: 1px solid var(--border-dark);
+      position: fixed; top: var(--nav-height); left: 0; bottom: 0;
+      display: flex; flex-direction: column; overflow-y: auto; z-index: 90;
+    }
+    .sidebar-profile { padding: 22px 18px; border-bottom: 1px solid var(--border-dark); display: flex; align-items: center; gap: 12px; }
+    .sidebar-avatar {
+      width: 42px; height: 42px; border-radius: 50%;
+      background: rgba(61,158,255,0.15); border: 2px solid var(--electric);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; font-weight: 700; color: var(--electric); flex-shrink: 0;
+    }
+    .sidebar-profile-name { font-size: 14px; font-weight: 600; color: var(--white); margin-bottom: 2px; }
+    .sidebar-profile-tag  { font-size: 11px; color: var(--text-on-dark-muted); }
+
+    .sidebar-nav { padding: 14px 10px; flex: 1; display: flex; flex-direction: column; gap: 2px; }
+    .sidebar-section-label { font-size: 10px; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase; color: rgba(255,255,255,0.25); padding: 12px 8px 6px; }
+    .sidebar-item {
+      display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+      border-radius: var(--radius-md); font-size: 13.5px; font-weight: 500;
+      color: var(--text-on-dark-muted); cursor: pointer; transition: var(--transition);
+      border: none; background: none; width: 100%; text-align: left; text-decoration: none;
+    }
+    .sidebar-item:hover  { background: rgba(255,255,255,0.06); color: var(--white); }
+    .sidebar-item.active { background: rgba(61,158,255,0.12); color: var(--electric); font-weight: 600; }
+    .sidebar-item-icon   { font-size: 16px; width: 20px; text-align: center; flex-shrink: 0; }
+    .sidebar-item-badge  { margin-left: auto; background: var(--electric); color: white; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 10px; min-width: 18px; text-align: center; }
+
+    .sidebar-sos-box {
+      margin: 12px 10px; padding: 14px;
+      background: rgba(255,71,87,0.1); border: 1px solid rgba(255,71,87,0.25);
+      border-radius: var(--radius-md); text-align: center;
+    }
+    .sidebar-sos-box button {
+      width: 100%; background: var(--danger); color: white; font-weight: 700;
+      font-size: 13px; padding: 10px; border-radius: var(--radius-md);
+    }
+    .sidebar-bottom { padding: 14px 10px; border-top: 1px solid var(--border-dark); }
+
+    /* ── MAIN ── */
+    .dashboard-main { margin-left: 252px; flex: 1; padding: 30px 36px 60px; min-height: calc(100vh - var(--nav-height)); }
+
+    .dash-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 26px; flex-wrap: wrap; gap: 16px; }
+    .dash-greeting { font-size: 13px; color: var(--text-muted); margin-bottom: 4px; }
+    .dash-title    { font-family: 'Georgia', serif; font-size: 25px; font-weight: 700; color: var(--text-primary); }
+
+    /* ── TOP GRID: Score + Today ── */
+    .top-grid { display: grid; grid-template-columns: 320px 1fr; gap: 20px; margin-bottom: 22px; }
+
+    .score-card {
+      background: var(--navy); border-radius: var(--radius-xl);
+      padding: 28px 24px; display: flex; flex-direction: column; align-items: center; text-align: center;
+      position: relative; overflow: hidden;
+    }
+    .score-card::before {
+      content: ''; position: absolute; top: -60px; right: -60px;
+      width: 200px; height: 200px;
+      background: radial-gradient(circle, rgba(61,158,255,0.2), transparent 70%);
+      border-radius: 50%;
+    }
+    .score-ring-svg { position: relative; z-index: 1; }
+    .score-num { font-family: 'Georgia', serif; font-size: 40px; font-weight: 700; fill: var(--white); }
+    .score-label-text { font-size: 10px; fill: var(--text-on-dark-muted); }
+    .score-status-badge {
+      margin-top: 14px; font-size: 12px; font-weight: 700; padding: 5px 14px;
+      border-radius: var(--radius-full); position: relative; z-index: 1;
+    }
+    .score-breakdown { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 18px; width: 100%; position: relative; z-index: 1; }
+    .score-breakdown-item { background: rgba(255,255,255,0.06); border-radius: var(--radius-md); padding: 8px 10px; }
+    .score-breakdown-label { font-size: 10px; color: var(--text-on-dark-muted); margin-bottom: 2px; }
+    .score-breakdown-val   { font-size: 14px; font-weight: 700; color: var(--white); }
+
+    /* Today's medicines panel */
+    .today-panel { background: var(--white); border: 1px solid var(--border-card); border-radius: var(--radius-xl); overflow: hidden; }
+    .today-panel-header { padding: 18px 22px; border-bottom: 1px solid var(--border-card); display: flex; align-items: center; justify-content: space-between; }
+    .today-panel-title { font-size: 15px; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 8px; }
+    .today-panel-body { padding: 8px 22px 18px; max-height: 340px; overflow-y: auto; }
+
+    .med-row {
+      display: flex; align-items: center; gap: 14px; padding: 13px 0;
+      border-bottom: 1px solid var(--border-card);
+    }
+    .med-row:last-child { border-bottom: none; }
+    .med-time-box {
+      width: 52px; flex-shrink: 0; text-align: center;
+      font-size: 11px; font-weight: 700; color: var(--electric);
+      background: rgba(61,158,255,0.08); border-radius: var(--radius-md); padding: 8px 4px;
+    }
+    .med-info { flex: 1; min-width: 0; }
+    .med-name { font-size: 13.5px; font-weight: 600; color: var(--text-primary); margin-bottom: 2px; }
+    .med-dosage { font-size: 11.5px; color: var(--text-muted); }
+    .med-actions { display: flex; gap: 6px; flex-shrink: 0; }
+    .med-action-btn {
+      width: 34px; height: 34px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; font-size: 15px;
+      border: 1.5px solid var(--border-card); transition: var(--transition);
+    }
+    .med-action-btn.taken { background: rgba(0,196,140,0.1); border-color: rgba(0,196,140,0.3); }
+    .med-action-btn.skip  { background: rgba(255,71,87,0.06); border-color: rgba(255,71,87,0.2); }
+    .med-status-tag { font-size: 10.5px; font-weight: 700; padding: 3px 9px; border-radius: var(--radius-full); flex-shrink: 0; }
+    .med-status-taken   { background: rgba(0,196,140,0.1); color: var(--success); }
+    .med-status-skipped { background: rgba(255,71,87,0.08); color: var(--danger); }
+
+    /* ── QUICK ACTIONS ── */
+    .quick-actions { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 22px; }
+    .quick-action-btn {
+      background: var(--white); border: 1px solid var(--border-card); border-radius: var(--radius-lg);
+      padding: 20px 14px; display: flex; flex-direction: column; align-items: center; gap: 10px;
+      cursor: pointer; transition: var(--transition); text-decoration: none; text-align: center;
+    }
+    .quick-action-btn:hover { border-color: rgba(61,158,255,0.3); box-shadow: var(--shadow-sm); transform: translateY(-2px); }
+    .quick-action-icon { font-size: 26px; }
+    .quick-action-label { font-size: 12px; font-weight: 600; color: var(--text-secondary); }
+
+    /* ── BOTTOM GRID ── */
+    .bottom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .panel { background: var(--white); border: 1px solid var(--border-card); border-radius: var(--radius-lg); overflow: hidden; }
+    .panel-header { padding: 17px 20px; border-bottom: 1px solid var(--border-card); display: flex; align-items: center; justify-content: space-between; }
+    .panel-title { font-size: 14.5px; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 8px; }
+    .panel-link  { font-size: 12.5px; color: var(--electric); font-weight: 600; cursor: pointer; }
+    .panel-empty { padding: 36px 20px; text-align: center; color: var(--text-muted); font-size: 13.5px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+    .panel-empty-icon { font-size: 32px; opacity: 0.4; }
+
+    .ai-companion-banner {
+      background: linear-gradient(135deg, var(--navy), var(--navy-mid));
+      border-radius: var(--radius-lg); padding: 22px; display: flex;
+      align-items: center; justify-content: space-between; gap: 18px; flex-wrap: wrap;
+      margin-bottom: 22px;
+    }
+    .ai-banner-tag { font-size: 10px; font-weight: 700; letter-spacing: 1.6px; text-transform: uppercase; color: var(--electric); margin-bottom: 6px; }
+    .ai-banner-title { font-size: 16px; font-weight: 700; color: var(--white); margin-bottom: 4px; }
+    .ai-banner-desc { font-size: 12.5px; color: var(--text-on-dark-muted); }
+
+    @media (max-width: 1100px) {
+      .top-grid { grid-template-columns: 1fr; }
+      .bottom-grid { grid-template-columns: 1fr; }
+      .quick-actions { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 860px) {
+      .sidebar { transform: translateX(-252px); transition: transform 0.3s; }
+      .sidebar.open { transform: translateX(0); }
+      .dashboard-main { margin-left: 0; padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <a href="index.html" class="nav-logo">
+      <svg class="nav-logo-icon" viewBox="0 0 36 36" fill="none">
+        <path d="M18 3 L5 9 L5 21 Q5 30 18 34 Q31 30 31 21 L31 9 Z" fill="#0f1f3d" stroke="#3d9eff" stroke-width="1.5"/>
+        <path d="M18 10 Q13 15 13 20 Q13 25 18 28 Q23 25 23 20 Q23 15 18 10Z" fill="#3d9eff" opacity="0.9"/>
+        <circle cx="18" cy="22" r="3.5" fill="white"/>
+      </svg>
+      <div class="nav-logo-text"><span class="nav-logo-name">curaah</span><span class="nav-logo-tag">AI Health Companion</span></div>
+    </a>
+    <ul class="nav-links"><li><a href="ai-companion.html">Ask AI</a></li></ul>
+    <div class="nav-actions">
+      <span style="font-size:13px;color:var(--text-on-dark-muted);">Hi, <strong style="color:var(--white);" id="navName">—</strong></span>
+      <button class="btn btn-ghost btn-sm" onclick="handleLogout()">Logout</button>
+    </div>
+    <div class="nav-hamburger" id="hamburger" onclick="toggleSidebar()"><span></span><span></span><span></span></div>
+  </nav>
+
+  <div class="dashboard-layout">
+
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-profile">
+        <div class="sidebar-avatar" id="sidebarAvatar">—</div>
+        <div>
+          <div class="sidebar-profile-name" id="sidebarName">Loading...</div>
+          <div class="sidebar-profile-tag" id="sidebarCity">—</div>
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="sidebar-section-label">Main</div>
+        <a class="sidebar-item active" href="dashboard.html"><span class="sidebar-item-icon">🏠</span> Dashboard</a>
+        <a class="sidebar-item" href="prescriptions.html"><span class="sidebar-item-icon">📋</span> Prescriptions</a>
+        <a class="sidebar-item" href="medicines.html"><span class="sidebar-item-icon">💊</span> My Medicines</a>
+        <a class="sidebar-item" href="adherence.html"><span class="sidebar-item-icon">📅</span> Adherence Log</a>
+        <a class="sidebar-item" href="lab-reports.html"><span class="sidebar-item-icon">📊</span> Lab Reports</a>
+        <a class="sidebar-item" href="ai-companion.html"><span class="sidebar-item-icon">🤖</span> AI Companion</a>
+        <div class="sidebar-section-label">Family & Safety</div>
+        <a class="sidebar-item" href="family.html"><span class="sidebar-item-icon">👨‍👩‍👧</span> Family Dashboard</a>
+        <a class="sidebar-item" href="recovery-score.html"><span class="sidebar-item-icon">📈</span> Recovery Score</a>
+        <div class="sidebar-section-label">Account</div>
+        <a class="sidebar-item" href="consent.html"><span class="sidebar-item-icon">🔒</span> Privacy & Consent</a>
+        <a class="sidebar-item" href="profile.html"><span class="sidebar-item-icon">👤</span> My Profile</a>
+      </nav>
+
+      <div class="sidebar-sos-box">
+        <div style="font-size:11px;color:var(--text-on-dark-muted);margin-bottom:8px;">In an emergency</div>
+        <button onclick="window.location.href='sos.html'">🚨 SOS</button>
+      </div>
+
+      <div class="sidebar-bottom">
+        <button class="sidebar-item" onclick="handleLogout()" style="color:var(--danger);"><span class="sidebar-item-icon">🚪</span> Logout</button>
+      </div>
+    </aside>
+
+    <main class="dashboard-main">
+
+      <div class="dash-header">
+        <div>
+          <div class="dash-greeting" id="greeting">Good morning 👋</div>
+          <div class="dash-title" id="dashTitle">Welcome back</div>
+        </div>
+        <a href="prescriptions.html" class="btn btn-primary">+ Upload Prescription</a>
+      </div>
+
+      <!-- AI Companion banner -->
+      <div class="ai-companion-banner">
+        <div>
+          <div class="ai-banner-tag">Your AI Companion</div>
+          <div class="ai-banner-title">Have a health question?</div>
+          <div class="ai-banner-desc">Ask anything — Curaah already knows your medicines, conditions, and history.</div>
+        </div>
+        <a href="ai-companion.html" class="btn btn-primary" style="white-space:nowrap;">Ask Curaah →</a>
+      </div>
+
+      <!-- Score + Today's medicines -->
+      <div class="top-grid">
+
+        <div class="score-card">
+          <svg class="score-ring-svg" width="160" height="160" viewBox="0 0 160 160">
+            <circle cx="80" cy="80" r="68" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="14" />
+            <circle id="scoreRingFg" cx="80" cy="80" r="68" fill="none" stroke="#3d9eff" stroke-width="14"
+              stroke-linecap="round" stroke-dasharray="427" stroke-dashoffset="427"
+              transform="rotate(-90 80 80)" style="transition: stroke-dashoffset 1s ease, stroke 0.3s;" />
+            <text x="80" y="78" text-anchor="middle" class="score-num" id="scoreNumText">—</text>
+            <text x="80" y="98" text-anchor="middle" class="score-label-text">RECOVERY SCORE</text>
+          </svg>
+          <div class="score-status-badge" id="scoreStatusBadge" style="background:rgba(61,158,255,0.15);color:#6ab4ff;">Loading...</div>
+
+          <div class="score-breakdown">
+            <div class="score-breakdown-item">
+              <div class="score-breakdown-label">Adherence</div>
+              <div class="score-breakdown-val" id="bdAdherence">—</div>
+            </div>
+            <div class="score-breakdown-item">
+              <div class="score-breakdown-label">Lifestyle</div>
+              <div class="score-breakdown-val" id="bdLifestyle">—</div>
+            </div>
+            <div class="score-breakdown-item">
+              <div class="score-breakdown-label">Lab Trend</div>
+              <div class="score-breakdown-val" id="bdLab">—</div>
+            </div>
+            <div class="score-breakdown-item">
+              <div class="score-breakdown-label">Engagement</div>
+              <div class="score-breakdown-val" id="bdEngagement">—</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="today-panel">
+          <div class="today-panel-header">
+            <div class="today-panel-title">💊 Today's Medicines</div>
+            <span class="badge badge-blue" id="todayDateBadge">—</span>
+          </div>
+          <div class="today-panel-body" id="todayMedsList">
+            <div class="panel-empty">
+              <div class="panel-empty-icon">💊</div>
+              <div>Loading today's schedule...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick actions -->
+      <div class="quick-actions">
+        <a href="prescriptions.html" class="quick-action-btn">
+          <span class="quick-action-icon">📸</span><span class="quick-action-label">Upload Prescription</span>
+        </a>
+        <a href="medicines.html" class="quick-action-btn">
+          <span class="quick-action-icon">📦</span><span class="quick-action-label">Verify a Medicine</span>
+        </a>
+        <a href="lab-reports.html" class="quick-action-btn">
+          <span class="quick-action-icon">📊</span><span class="quick-action-label">Upload Lab Report</span>
+        </a>
+        <a href="ai-companion.html" class="quick-action-btn">
+          <span class="quick-action-icon">🤖</span><span class="quick-action-label">Ask AI Companion</span>
+        </a>
+      </div>
+
+      <!-- Bottom grid -->
+      <div class="bottom-grid">
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">📋 Recent Prescriptions</div>
+            <span class="panel-link" onclick="window.location.href='prescriptions.html'">View all</span>
+          </div>
+          <div id="recentPrescriptions">
+            <div class="panel-empty">
+              <div class="panel-empty-icon">📋</div>
+              <div>No prescriptions uploaded yet.</div>
+              <a href="prescriptions.html" class="btn btn-secondary btn-sm">Upload First Prescription</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">📊 Recent Lab Reports</div>
+            <span class="panel-link" onclick="window.location.href='lab-reports.html'">View all</span>
+          </div>
+          <div id="recentLabReports">
+            <div class="panel-empty">
+              <div class="panel-empty-icon">📊</div>
+              <div>No lab reports yet.</div>
+              <a href="lab-reports.html" class="btn btn-secondary btn-sm">Upload a Report</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script src="js/main.js"></script>
+  <script type="module">
+    import { supabase, requireAuth, signOutUser } from './js/supabase.js';
+
+    let currentUser = null;
+    const TODAY = getTodayLocal();
+
+    async function init() {
+      const session = await requireAuth('login.html');
+      if (!session) return;
+
+      const { data: profile, error } = await supabase
+        .from('users').select('*').eq('id', session.user.id).single();
+
+      if (error || !profile) {
+        showToast('Could not load your profile.', 'error');
+        return;
+      }
+
+      currentUser = profile;
+      setPreferredLanguage(profile.preferred_language || 'hindi');
+
+      const firstName = (profile.full_name || 'there').split(' ')[0];
+      const initials  = getInitials(profile.full_name);
+
+      document.getElementById('navName').textContent       = firstName;
+      document.getElementById('sidebarName').textContent   = profile.full_name || '—';
+      document.getElementById('sidebarAvatar').textContent = initials;
+      document.getElementById('sidebarCity').textContent   = profile.city || 'India';
+      document.getElementById('dashTitle').textContent     = `Welcome back, ${firstName} 👋`;
+
+      const greet = greetingForHour();
+      document.getElementById('greeting').textContent = `${greet.en} 👋`;
+
+      document.getElementById('todayDateBadge').textContent =
+        new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+
+      await Promise.all([
+        loadRecoveryScore(),
+        loadTodayMedicines(),
+        loadRecentPrescriptions(),
+        loadRecentLabReports(),
+      ]);
+    }
+
+    // ── Recovery Score ──
+    async function loadRecoveryScore() {
+      try {
+        await supabase.rpc('calculate_recovery_score', { p_user_id: currentUser.id, p_date: TODAY });
+      } catch (_) { /* if function call fails, fall back to reading existing row */ }
+
+      const { data: score } = await supabase
+        .from('recovery_scores')
+        .select('*')
+        .eq('user_id', currentUser.id)
+        .eq('score_date', TODAY)
+        .single();
+
+      const overall = score?.overall_score ?? 0;
+      const circumference = 427; // 2 * PI * 68
+      const offset = circumference - (circumference * Math.min(overall, 100) / 100);
+      const color = scoreColor(overall);
+
+      const ring = document.getElementById('scoreRingFg');
+      ring.style.strokeDashoffset = offset;
+      ring.style.stroke = color;
+
+      document.getElementById('scoreNumText').textContent = score ? Math.round(overall) : '—';
+
+      const badge = document.getElementById('scoreStatusBadge');
+      badge.textContent = score ? scoreLabel(overall) : 'Not enough data yet';
+      badge.style.color = color;
+      badge.style.background = color + '26';
+
+      document.getElementById('bdAdherence').textContent  = score ? Math.round(score.adherence_score) + '%' : '—';
+      document.getElementById('bdLifestyle').textContent  = score ? Math.round(score.lifestyle_score) + '%' : '—';
+      document.getElementById('bdLab').textContent         = score ? Math.round(score.lab_score) + '%' : '—';
+      document.getElementById('bdEngagement').textContent  = score ? Math.round(score.engagement_score) + '%' : '—';
+    }
+
+    // ── Today's Medicines ──
+    async function loadTodayMedicines() {
+      const listEl = document.getElementById('todayMedsList');
+
+      const { data: medicines } = await supabase
+        .from('medicines')
+        .select('*')
+        .eq('user_id', currentUser.id)
+        .eq('is_active', true);
+
+      if (!medicines || !medicines.length) {
+        listEl.innerHTML = `
+          <div class="panel-empty">
+            <div class="panel-empty-icon">💊</div>
+            <div>No medicines added yet.</div>
+            <a href="prescriptions.html" class="btn btn-secondary btn-sm">Upload a Prescription</a>
+          </div>`;
+        return;
+      }
+
+      const { data: todayLogs } = await supabase
+        .from('adherence_logs')
+        .select('*')
+        .eq('user_id', currentUser.id)
+        .eq('scheduled_date', TODAY);
+
+      const logMap = {};
+      (todayLogs || []).forEach(l => { logMap[`${l.medicine_id}_${l.scheduled_time}`] = l; });
+
+      const timeOrder = { morning: 1, afternoon: 2, evening: 3, night: 4 };
+      const timeLabels = { morning: '🌅 AM', afternoon: '☀️ Noon', evening: '🌇 Eve', night: '🌙 Night' };
+
+      const rows = [];
+      medicines.forEach(med => {
+        (med.timing || []).forEach(t => {
+          const log = logMap[`${med.id}_${t}`];
+          rows.push({ med, time: t, log });
+        });
+      });
+      rows.sort((a, b) => (timeOrder[a.time] || 9) - (timeOrder[b.time] || 9));
+
+      if (!rows.length) {
+        listEl.innerHTML = `<div class="panel-empty"><div class="panel-empty-icon">💊</div><div>No doses scheduled for today.</div></div>`;
+        return;
+      }
+
+      listEl.innerHTML = rows.map(({ med, time, log }) => {
+        const statusTag = log
+          ? `<span class="med-status-tag ${log.status === 'taken' ? 'med-status-taken' : 'med-status-skipped'}">${log.status === 'taken' ? '✓ Taken' : '✗ Skipped'}</span>`
+          : `<div class="med-actions">
+               <button class="med-action-btn taken" title="Mark as taken" onclick="logAdherence('${med.id}','${time}','taken')">✓</button>
+               <button class="med-action-btn skip" title="Mark as skipped" onclick="logAdherence('${med.id}','${time}','skipped')">✗</button>
+             </div>`;
+
+        return `
+          <div class="med-row">
+            <div class="med-time-box">${timeLabels[time] || time}</div>
+            <div class="med-info">
+              <div class="med-name">${med.name}</div>
+              <div class="med-dosage">${med.dosage || ''} ${med.before_after_food ? '· ' + med.before_after_food + ' food' : ''}</div>
+            </div>
+            ${statusTag}
+          </div>`;
+      }).join('');
+    }
+
+    window.logAdherence = async function (medicineId, scheduledTime, status) {
+      let skipReason = null;
+
+      if (status === 'skipped') {
+        skipReason = prompt('No problem. Why was it skipped? (forgot / side_effects / unavailable / other)\nThis helps Curaah understand and adjust — not to judge.', 'forgot');
+        if (skipReason === null) return; // user cancelled
+      }
+
+      const { error } = await supabase.from('adherence_logs').insert({
+        user_id: currentUser.id,
+        medicine_id: medicineId,
+        scheduled_date: TODAY,
+        scheduled_time: scheduledTime,
+        status,
+        taken_at: status === 'taken' ? new Date().toISOString() : null,
+        skip_reason: status === 'skipped' ? (skipReason || 'other') : null,
+        logged_via: 'app',
+      });
+
+      if (error) {
+        showToast('Could not log this — please try again.', 'error');
+        return;
+      }
+
+      showToast(status === 'taken' ? 'Marked as taken ✓' : 'Logged — thank you for letting us know', 'success');
+      await loadTodayMedicines();
+      await loadRecoveryScore();
+    };
+
+    // ── Recent Prescriptions ──
+    async function loadRecentPrescriptions() {
+      const { data } = await supabase
+        .from('prescriptions')
+        .select('id, doctor_name, prescription_date, extraction_status, created_at')
+        .eq('user_id', currentUser.id)
+        .order('created_at', { ascending: false })
+        .limit(3);
+
+      const el = document.getElementById('recentPrescriptions');
+      if (!data || !data.length) return; // empty state already shown
+
+      el.innerHTML = data.map(p => `
+        <div style="padding:14px 20px;border-bottom:1px solid var(--border-card);display:flex;justify-content:space-between;align-items:center;gap:10px;">
+          <div>
+            <div style="font-size:13.5px;font-weight:600;color:var(--text-primary);">${p.doctor_name || 'Prescription'}</div>
+            <div style="font-size:11.5px;color:var(--text-muted);">${formatDateReadable(p.prescription_date) !== '—' ? formatDateReadable(p.prescription_date) : formatTimeAgo(p.created_at)}</div>
+          </div>
+          <span class="badge ${p.extraction_status === 'completed' ? 'badge-green' : 'badge-orange'}">${p.extraction_status === 'completed' ? 'Verified' : 'Processing'}</span>
+        </div>`).join('');
+    }
+
+    // ── Recent Lab Reports ──
+    async function loadRecentLabReports() {
+      const { data } = await supabase
+        .from('lab_reports')
+        .select('id, report_type, report_date, created_at')
+        .eq('user_id', currentUser.id)
+        .order('created_at', { ascending: false })
+        .limit(3);
+
+      const el = document.getElementById('recentLabReports');
+      if (!data || !data.length) return;
+
+      el.innerHTML = data.map(r => `
+        <div style="padding:14px 20px;border-bottom:1px solid var(--border-card);display:flex;justify-content:space-between;align-items:center;gap:10px;">
+          <div>
+            <div style="font-size:13.5px;font-weight:600;color:var(--text-primary);">${(r.report_type || 'Report').replace(/_/g,' ')}</div>
+            <div style="font-size:11.5px;color:var(--text-muted);">${formatDateReadable(r.report_date) !== '—' ? formatDateReadable(r.report_date) : formatTimeAgo(r.created_at)}</div>
+          </div>
+          <span class="badge badge-blue">View →</span>
+        </div>`).join('');
+    }
+
+    window.handleLogout = async function () {
+      await signOutUser();
+      showToast('Logged out.', 'success');
+      setTimeout(() => { window.location.href = 'index.html'; }, 600);
+    };
+
+    init();
+  </script>
+
+</body>
+</html>
