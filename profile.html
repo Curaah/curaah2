@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Profile — Curaah</title>
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg" />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    body { background: var(--off-white); min-height: 100vh; }
+    .dashboard-layout { display: flex; min-height: 100vh; padding-top: var(--nav-height); }
+
+    .sidebar {
+      width: 252px; flex-shrink: 0; background: var(--navy);
+      border-right: 1px solid var(--border-dark);
+      position: fixed; top: var(--nav-height); left: 0; bottom: 0;
+      display: flex; flex-direction: column; overflow-y: auto; z-index: 90;
+    }
+    .sidebar-profile { padding: 22px 18px; border-bottom: 1px solid var(--border-dark); display: flex; align-items: center; gap: 12px; }
+    .sidebar-avatar {
+      width: 42px; height: 42px; border-radius: 50%;
+      background: rgba(61,158,255,0.15); border: 2px solid var(--electric);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; font-weight: 700; color: var(--electric); flex-shrink: 0;
+    }
+    .sidebar-profile-name { font-size: 14px; font-weight: 600; color: var(--white); margin-bottom: 2px; }
+    .sidebar-profile-tag  { font-size: 11px; color: var(--text-on-dark-muted); }
+    .sidebar-nav { padding: 14px 10px; flex: 1; display: flex; flex-direction: column; gap: 2px; }
+    .sidebar-section-label { font-size: 10px; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase; color: rgba(255,255,255,0.25); padding: 12px 8px 6px; }
+    .sidebar-item {
+      display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+      border-radius: var(--radius-md); font-size: 13.5px; font-weight: 500;
+      color: var(--text-on-dark-muted); cursor: pointer; transition: var(--transition);
+      border: none; background: none; width: 100%; text-align: left; text-decoration: none;
+    }
+    .sidebar-item:hover  { background: rgba(255,255,255,0.06); color: var(--white); }
+    .sidebar-item.active { background: rgba(61,158,255,0.12); color: var(--electric); font-weight: 600; }
+    .sidebar-item-icon   { font-size: 16px; width: 20px; text-align: center; flex-shrink: 0; }
+    .sidebar-sos-box { margin: 12px 10px; padding: 14px; background: rgba(255,71,87,0.1); border: 1px solid rgba(255,71,87,0.25); border-radius: var(--radius-md); text-align: center; }
+    .sidebar-sos-box button { width: 100%; background: var(--danger); color: white; font-weight: 700; font-size: 13px; padding: 10px; border-radius: var(--radius-md); }
+    .sidebar-bottom { padding: 14px 10px; border-top: 1px solid var(--border-dark); }
+
+    .dashboard-main { margin-left: 252px; flex: 1; padding: 30px 36px 60px; }
+    .dash-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 22px; flex-wrap: wrap; gap: 16px; }
+    .dash-greeting { font-size: 13px; color: var(--text-muted); margin-bottom: 4px; }
+    .dash-title    { font-family: 'Georgia', serif; font-size: 25px; font-weight: 700; color: var(--text-primary); }
+
+    /* Profile completeness banner */
+    .completeness-banner {
+      background: var(--navy); border-radius: var(--radius-xl); padding: 22px 26px;
+      display: flex; align-items: center; gap: 20px; margin-bottom: 24px; flex-wrap: wrap;
+    }
+    .completeness-ring-wrap { flex-shrink: 0; }
+    .completeness-num { font-family: 'Georgia', serif; font-size: 22px; font-weight: 700; fill: var(--white); }
+    .completeness-info { flex: 1; }
+    .completeness-title { font-size: 15px; font-weight: 700; color: var(--white); margin-bottom: 4px; }
+    .completeness-desc { font-size: 12.5px; color: var(--text-on-dark-muted); line-height: 1.6; }
+
+    /* Tabs */
+    .profile-tabs { display: flex; gap: 0; background: var(--white); border: 1px solid var(--border-card); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 22px; max-width: 540px; }
+    .profile-tab { flex: 1; padding: 11px 14px; font-size: 12.5px; font-weight: 600; color: var(--text-muted); cursor: pointer; transition: var(--transition); border: none; background: none; }
+    .profile-tab.active { background: var(--electric); color: white; }
+
+    .panel { background: var(--white); border: 1px solid var(--border-card); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 20px; }
+    .panel-header { padding: 17px 20px; border-bottom: 1px solid var(--border-card); display: flex; align-items: center; justify-content: space-between; }
+    .panel-title { font-size: 14.5px; font-weight: 700; color: var(--text-primary); }
+    .panel-body { padding: 20px; }
+
+    .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+
+    .tag-input-wrap { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px; border: 1.5px solid var(--border-card); border-radius: var(--radius-md); min-height: 44px; }
+    .tag-chip { display: inline-flex; align-items: center; gap: 6px; background: rgba(61,158,255,0.08); color: var(--electric); font-size: 12px; font-weight: 600; padding: 5px 10px; border-radius: var(--radius-full); }
+    .tag-chip button { color: var(--electric); font-size: 13px; }
+    .tag-input-field { border: none; outline: none; flex: 1; min-width: 120px; font-size: 13px; font-family: inherit; }
+
+    .lang-select-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .lang-option { border: 1.5px solid var(--border-card); border-radius: var(--radius-md); padding: 12px 10px; text-align: center; cursor: pointer; transition: var(--transition); }
+    .lang-option.selected { border-color: var(--electric); background: rgba(61,158,255,0.05); }
+    .lang-option-label { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+    .lang-option-native { font-size: 11.5px; color: var(--text-muted); margin-top: 2px; }
+
+    @media (max-width: 860px) {
+      .sidebar { transform: translateX(-252px); transition: transform 0.3s; }
+      .sidebar.open { transform: translateX(0); }
+      .dashboard-main { margin-left: 0; padding: 20px; }
+      .form-row-2, .form-row-3, .lang-select-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <a href="index.html" class="nav-logo">
+      <svg class="nav-logo-icon" viewBox="0 0 36 36" fill="none">
+        <path d="M18 3 L5 9 L5 21 Q5 30 18 34 Q31 30 31 21 L31 9 Z" fill="#0f1f3d" stroke="#3d9eff" stroke-width="1.5"/>
+        <path d="M18 10 Q13 15 13 20 Q13 25 18 28 Q23 25 23 20 Q23 15 18 10Z" fill="#3d9eff" opacity="0.9"/>
+        <circle cx="18" cy="22" r="3.5" fill="white"/>
+      </svg>
+      <div class="nav-logo-text"><span class="nav-logo-name">curaah</span><span class="nav-logo-tag">AI Health Companion</span></div>
+    </a>
+    <ul class="nav-links"><li><a href="ai-companion.html">Ask AI</a></li></ul>
+    <div class="nav-actions">
+      <span style="font-size:13px;color:var(--text-on-dark-muted);">Hi, <strong style="color:var(--white);" id="navName">—</strong></span>
+      <button class="btn btn-ghost btn-sm" onclick="handleLogout()">Logout</button>
+    </div>
+    <div class="nav-hamburger" id="hamburger" onclick="toggleSidebar()"><span></span><span></span><span></span></div>
+  </nav>
+
+  <div class="dashboard-layout">
+
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-profile">
+        <div class="sidebar-avatar" id="sidebarAvatar">—</div>
+        <div><div class="sidebar-profile-name" id="sidebarName">Loading...</div><div class="sidebar-profile-tag" id="sidebarCity">—</div></div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="sidebar-section-label">Main</div>
+        <a class="sidebar-item" href="dashboard.html"><span class="sidebar-item-icon">🏠</span> Dashboard</a>
+        <a class="sidebar-item" href="prescriptions.html"><span class="sidebar-item-icon">📋</span> Prescriptions</a>
+        <a class="sidebar-item" href="medicines.html"><span class="sidebar-item-icon">💊</span> My Medicines</a>
+        <a class="sidebar-item" href="adherence.html"><span class="sidebar-item-icon">📅</span> Adherence Log</a>
+        <a class="sidebar-item" href="lab-reports.html"><span class="sidebar-item-icon">📊</span> Lab Reports</a>
+        <a class="sidebar-item" href="ai-companion.html"><span class="sidebar-item-icon">🤖</span> AI Companion</a>
+        <div class="sidebar-section-label">Family & Safety</div>
+        <a class="sidebar-item" href="family.html"><span class="sidebar-item-icon">👨‍👩‍👧</span> Family Dashboard</a>
+        <a class="sidebar-item" href="recovery-score.html"><span class="sidebar-item-icon">📈</span> Recovery Score</a>
+        <div class="sidebar-section-label">Account</div>
+        <a class="sidebar-item" href="consent.html"><span class="sidebar-item-icon">🔒</span> Privacy & Consent</a>
+        <a class="sidebar-item active" href="profile.html"><span class="sidebar-item-icon">👤</span> My Profile</a>
+      </nav>
+      <div class="sidebar-sos-box">
+        <div style="font-size:11px;color:var(--text-on-dark-muted);margin-bottom:8px;">In an emergency</div>
+        <button onclick="window.location.href='sos.html'">🚨 SOS</button>
+      </div>
+      <div class="sidebar-bottom">
+        <button class="sidebar-item" onclick="handleLogout()" style="color:var(--danger);"><span class="sidebar-item-icon">🚪</span> Logout</button>
+      </div>
+    </aside>
+
+    <main class="dashboard-main">
+
+      <div class="dash-header">
+        <div>
+          <div class="dash-greeting">The more complete this is, the better Curaah can help</div>
+          <div class="dash-title">My Profile</div>
+        </div>
+      </div>
+
+      <!-- Completeness banner -->
+      <div class="completeness-banner">
+        <div class="completeness-ring-wrap">
+          <svg width="64" height="64" viewBox="0 0 64 64">
+            <circle cx="32" cy="32" r="26" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="7" />
+            <circle id="completenessRing" cx="32" cy="32" r="26" fill="none" stroke="#3d9eff" stroke-width="7"
+              stroke-linecap="round" stroke-dasharray="163" stroke-dashoffset="163"
+              transform="rotate(-90 32 32)" style="transition: stroke-dashoffset 0.8s ease;" />
+            <text x="32" y="37" text-anchor="middle" class="completeness-num" id="completenessPct">0%</text>
+          </svg>
+        </div>
+        <div class="completeness-info">
+          <div class="completeness-title">Profile Completeness</div>
+          <div class="completeness-desc" id="completenessDesc">Fill in your details below — this helps your AI Companion give more relevant guidance and helps in any future emergency.</div>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="profile-tabs">
+        <button class="profile-tab active" onclick="switchTab('basic', this)">👤 Basic Info</button>
+        <button class="profile-tab" onclick="switchTab('health', this)">🩺 Health Profile</button>
+        <button class="profile-tab" onclick="switchTab('preferences', this)">⚙️ Preferences</button>
+      </div>
+
+      <!-- Basic Info -->
+      <div id="tab-basic">
+        <div class="panel">
+          <div class="panel-header"><div class="panel-title">👤 Basic Information</div></div>
+          <div class="panel-body">
+            <div class="form-row-2">
+              <div class="form-group"><label class="form-label">Full Name</label><input class="form-input" type="text" id="pName" /></div>
+              <div class="form-group"><label class="form-label">Phone Number</label><input class="form-input" type="text" id="pPhone" disabled style="background:var(--off-white);" /></div>
+            </div>
+            <div class="form-row-2">
+              <div class="form-group"><label class="form-label">Email</label><input class="form-input" type="email" id="pEmail" /></div>
+              <div class="form-group"><label class="form-label">Date of Birth</label><input class="form-input" type="date" id="pDob" /></div>
+            </div>
+            <div class="form-row-2">
+              <div class="form-group">
+                <label class="form-label">Gender</label>
+                <select class="form-input form-select" id="pGender">
+                  <option value="">Select</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="other">Other</option>
+                  <option value="prefer_not_to_say">Prefer not to say</option>
+                </select>
+              </div>
+              <div class="form-group"><label class="form-label">City</label><input class="form-input" type="text" id="pCity" /></div>
+            </div>
+            <div class="form-row-2">
+              <div class="form-group"><label class="form-label">Height (cm)</label><input class="form-input" type="number" id="pHeight" /></div>
+              <div class="form-group"><label class="form-label">Weight (kg)</label><input class="form-input" type="number" id="pWeight" /></div>
+            </div>
+            <button class="btn btn-primary" onclick="saveBasicInfo()">Save Basic Info</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Health Profile -->
+      <div id="tab-health" style="display:none;">
+        <div class="panel">
+          <div class="panel-header"><div class="panel-title">🩺 Health Profile</div></div>
+          <div class="panel-body">
+
+            <div class="form-group">
+              <label class="form-label">Ongoing Conditions</label>
+              <div class="tag-input-wrap" id="conditionsWrap">
+                <input class="tag-input-field" id="conditionsInput" placeholder="Type and press Enter (e.g. Diabetes)" onkeydown="handleTagInput(event,'conditions')" />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Allergies</label>
+              <div class="tag-input-wrap" id="allergiesWrap">
+                <input class="tag-input-field" id="allergiesInput" placeholder="Type and press Enter" onkeydown="handleTagInput(event,'allergies')" />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Family History</label>
+              <div class="tag-input-wrap" id="familyHistoryWrap">
+                <input class="tag-input-field" id="familyHistoryInput" placeholder="e.g. Father — heart disease" onkeydown="handleTagInput(event,'familyHistory')" />
+              </div>
+            </div>
+
+            <div class="form-row-3">
+              <div class="form-group">
+                <label class="form-label">Blood Group</label>
+                <select class="form-input form-select" id="pBloodGroup">
+                  <option value="">Unknown</option>
+                  <option>A+</option><option>A-</option><option>B+</option><option>B-</option>
+                  <option>AB+</option><option>AB-</option><option>O+</option><option>O-</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Smoking</label>
+                <select class="form-input form-select" id="pSmoking">
+                  <option value="">Select</option>
+                  <option value="never">Never</option>
+                  <option value="former">Former</option>
+                  <option value="current">Current</option>
+                  <option value="prefer_not_to_say">Prefer not to say</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Alcohol</label>
+                <select class="form-input form-select" id="pAlcohol">
+                  <option value="">Select</option>
+                  <option value="never">Never</option>
+                  <option value="occasional">Occasional</option>
+                  <option value="regular">Regular</option>
+                  <option value="prefer_not_to_say">Prefer not to say</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row-2">
+              <div class="form-group">
+                <label class="form-label">Activity Level</label>
+                <select class="form-input form-select" id="pActivity">
+                  <option value="">Select</option>
+                  <option value="sedentary">Sedentary</option>
+                  <option value="light">Light</option>
+                  <option value="moderate">Moderate</option>
+                  <option value="active">Active</option>
+                  <option value="very_active">Very Active</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Dietary Preference</label>
+                <select class="form-input form-select" id="pDiet">
+                  <option value="">Select</option>
+                  <option value="vegetarian">Vegetarian</option>
+                  <option value="vegan">Vegan</option>
+                  <option value="non_vegetarian">Non-Vegetarian</option>
+                  <option value="eggetarian">Eggetarian</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row-2">
+              <div class="form-group"><label class="form-label">Primary Doctor</label><input class="form-input" type="text" id="pDoctor" /></div>
+              <div class="form-group"><label class="form-label">Primary Hospital / Clinic</label><input class="form-input" type="text" id="pHospital" /></div>
+            </div>
+
+            <div class="form-row-2">
+              <div class="form-group"><label class="form-label">Emergency Contact Name</label><input class="form-input" type="text" id="pEmergencyName" /></div>
+              <div class="form-group"><label class="form-label">Emergency Contact Phone</label><input class="form-input" type="tel" id="pEmergencyPhone" maxlength="10" /></div>
+            </div>
+
+            <button class="btn btn-primary" onclick="saveHealthProfile()">Save Health Profile</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Preferences -->
+      <div id="tab-preferences" style="display:none;">
+        <div class="panel">
+          <div class="panel-header"><div class="panel-title">⚙️ Preferences</div></div>
+          <div class="panel-body">
+            <div class="form-group">
+              <label class="form-label">Preferred Language</label>
+              <div class="lang-select-row">
+                <div class="lang-option" data-lang="hindi" onclick="selectLang(this,'hindi')"><div class="lang-option-label">Hindi</div><div class="lang-option-native">हिन्दी</div></div>
+                <div class="lang-option" data-lang="punjabi" onclick="selectLang(this,'punjabi')"><div class="lang-option-label">Punjabi</div><div class="lang-option-native">ਪੰਜਾਬੀ</div></div>
+                <div class="lang-option" data-lang="english" onclick="selectLang(this,'english')"><div class="lang-option-label">English</div><div class="lang-option-native">English</div></div>
+              </div>
+              <span class="form-hint">This is the language your AI Companion will use to talk to you.</span>
+            </div>
+            <button class="btn btn-primary" onclick="savePreferences()">Save Preferences</button>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script src="js/main.js"></script>
+  <script type="module">
+    import { supabase, requireAuth, signOutUser } from './js/supabase.js';
+
+    let currentUser = null;
+    let healthProfile = null;
+    let selectedLang = 'hindi';
+
+    const tags = { conditions: [], allergies: [], familyHistory: [] };
+
+    async function init() {
+      const session = await requireAuth('login.html');
+      if (!session) return;
+
+      const { data: profile } = await supabase.from('users').select('*').eq('id', session.user.id).single();
+      if (!profile) return;
+      currentUser = profile;
+
+      const { data: hp } = await supabase.from('health_profiles').select('*').eq('user_id', session.user.id).single();
+      healthProfile = hp || {};
+
+      document.getElementById('navName').textContent       = (profile.full_name || '').split(' ')[0] || '—';
+      document.getElementById('sidebarName').textContent   = profile.full_name || '—';
+      document.getElementById('sidebarAvatar').textContent = getInitials(profile.full_name);
+      document.getElementById('sidebarCity').textContent   = profile.city || 'India';
+
+      // Populate basic info
+      document.getElementById('pName').value   = profile.full_name || '';
+      document.getElementById('pPhone').value  = profile.phone || '';
+      document.getElementById('pEmail').value  = (profile.email || '').includes('@curaah.user') ? '' : (profile.email || '');
+      document.getElementById('pDob').value    = profile.date_of_birth || '';
+      document.getElementById('pGender').value = profile.gender || '';
+      document.getElementById('pCity').value   = profile.city || '';
+      document.getElementById('pHeight').value = profile.height_cm || '';
+      document.getElementById('pWeight').value = profile.weight_kg || '';
+
+      // Populate health profile
+      tags.conditions = healthProfile.conditions || [];
+      tags.allergies = healthProfile.allergies || [];
+      tags.familyHistory = healthProfile.family_history || [];
+      renderTags('conditions');
+      renderTags('allergies');
+      renderTags('familyHistory');
+
+      document.getElementById('pBloodGroup').value   = healthProfile.blood_group || '';
+      document.getElementById('pSmoking').value      = healthProfile.smoking || '';
+      document.getElementById('pAlcohol').value       = healthProfile.alcohol || '';
+      document.getElementById('pActivity').value      = healthProfile.activity_level || '';
+      document.getElementById('pDiet').value          = healthProfile.dietary_preference || '';
+      document.getElementById('pDoctor').value        = healthProfile.primary_doctor_name || '';
+      document.getElementById('pHospital').value      = healthProfile.primary_hospital || '';
+      document.getElementById('pEmergencyName').value  = healthProfile.emergency_contact_name || '';
+      document.getElementById('pEmergencyPhone').value = healthProfile.emergency_contact_phone || '';
+
+      // Language
+      selectedLang = profile.preferred_language || 'hindi';
+      document.querySelectorAll('.lang-option').forEach(o => o.classList.toggle('selected', o.dataset.lang === selectedLang));
+
+      updateCompleteness();
+    }
+
+    window.switchTab = function (tab, btn) {
+      ['basic', 'health', 'preferences'].forEach(t => {
+        document.getElementById('tab-' + t).style.display = t === tab ? 'block' : 'none';
+      });
+      document.querySelectorAll('.profile-tab').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    };
+
+    // ── Tag inputs (conditions, allergies, family history) ──
+    function renderTags(key) {
+      const wrap = document.getElementById(key + 'Wrap');
+      const input = document.getElementById(key + 'Input');
+      wrap.querySelectorAll('.tag-chip').forEach(c => c.remove());
+      tags[key].forEach((val, i) => {
+        const chip = document.createElement('span');
+        chip.className = 'tag-chip';
+        chip.innerHTML = `${val} <button onclick="removeTag('${key}',${i})">✕</button>`;
+        wrap.insertBefore(chip, input);
+      });
+    }
+
+    window.handleTagInput = function (e, key) {
+      if (e.key === 'Enter' && e.target.value.trim()) {
+        e.preventDefault();
+        tags[key].push(e.target.value.trim());
+        e.target.value = '';
+        renderTags(key);
+      }
+    };
+
+    window.removeTag = function (key, index) {
+      tags[key].splice(index, 1);
+      renderTags(key);
+    };
+
+    window.selectLang = function (el, lang) {
+      document.querySelectorAll('.lang-option').forEach(o => o.classList.remove('selected'));
+      el.classList.add('selected');
+      selectedLang = lang;
+    };
+
+    // ── Save handlers ──
+    window.saveBasicInfo = async function () {
+      const updates = {
+        full_name: document.getElementById('pName').value.trim(),
+        email: document.getElementById('pEmail').value.trim() || currentUser.email,
+        date_of_birth: document.getElementById('pDob').value || null,
+        gender: document.getElementById('pGender').value || null,
+        city: document.getElementById('pCity').value.trim() || null,
+        height_cm: document.getElementById('pHeight').value || null,
+        weight_kg: document.getElementById('pWeight').value || null,
+      };
+
+      const { error } = await supabase.from('users').update(updates).eq('id', currentUser.id);
+      if (error) { showToast('Could not save. Please try again.', 'error'); return; }
+
+      Object.assign(currentUser, updates);
+      showToast('Basic info saved.', 'success');
+      updateCompleteness();
+    };
+
+    window.saveHealthProfile = async function () {
+      const updates = {
+        conditions: tags.conditions,
+        allergies: tags.allergies,
+        family_history: tags.familyHistory,
+        blood_group: document.getElementById('pBloodGroup').value || null,
+        smoking: document.getElementById('pSmoking').value || null,
+        alcohol: document.getElementById('pAlcohol').value || null,
+        activity_level: document.getElementById('pActivity').value || null,
+        dietary_preference: document.getElementById('pDiet').value || null,
+        primary_doctor_name: document.getElementById('pDoctor').value.trim() || null,
+        primary_hospital: document.getElementById('pHospital').value.trim() || null,
+        emergency_contact_name: document.getElementById('pEmergencyName').value.trim() || null,
+        emergency_contact_phone: document.getElementById('pEmergencyPhone').value.trim() || null,
+      };
+
+      const { error } = await supabase
+        .from('health_profiles')
+        .upsert({ user_id: currentUser.id, ...updates }, { onConflict: 'user_id' });
+
+      if (error) { showToast('Could not save. Please try again.', 'error'); return; }
+
+      Object.assign(healthProfile, updates);
+      showToast('Health profile saved.', 'success');
+      updateCompleteness();
+    };
+
+    window.savePreferences = async function () {
+      const { error } = await supabase
+        .from('users')
+        .update({ preferred_language: selectedLang })
+        .eq('id', currentUser.id);
+
+      if (error) { showToast('Could not save. Please try again.', 'error'); return; }
+
+      currentUser.preferred_language = selectedLang;
+      setPreferredLanguage(selectedLang);
+      showToast('Preferences saved.', 'success');
+    };
+
+    // ── Completeness calculation (mirrors what matters for AI context quality) ──
+    function updateCompleteness() {
+      const checks = [
+        !!currentUser.full_name,
+        !!currentUser.date_of_birth,
+        !!currentUser.gender,
+        !!currentUser.city,
+        !!currentUser.height_cm,
+        !!currentUser.weight_kg,
+        tags.conditions.length > 0,
+        !!healthProfile.blood_group,
+        !!healthProfile.activity_level,
+        !!healthProfile.emergency_contact_phone,
+      ];
+      const pct = Math.round((checks.filter(Boolean).length / checks.length) * 100);
+
+      const circumference = 163; // 2 * PI * 26
+      const offset = circumference - (circumference * pct / 100);
+      document.getElementById('completenessRing').style.strokeDashoffset = offset;
+      document.getElementById('completenessPct').textContent = pct + '%';
+
+      const desc = document.getElementById('completenessDesc');
+      if (pct >= 90) desc.textContent = "Your profile is in great shape — Curaah has what it needs to support you well.";
+      else if (pct >= 50) desc.textContent = "Good start. A few more details will help your AI Companion give even more relevant guidance.";
+      else desc.textContent = "Fill in your details below — this helps your AI Companion give more relevant guidance and helps in any future emergency.";
+    }
+
+    window.handleLogout = async function () {
+      await signOutUser();
+      showToast('Logged out.', 'success');
+      setTimeout(() => { window.location.href = 'index.html'; }, 600);
+    };
+
+    init();
+  </script>
+
+</body>
+</html>
