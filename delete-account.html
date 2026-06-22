@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Delete My Account — Curaah</title>
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg" />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    body { background: var(--off-white); min-height: 100vh; }
+
+    .delete-page {
+      min-height: 100vh; display: flex; align-items: flex-start; justify-content: center;
+      padding: calc(var(--nav-height) + 32px) 5% 60px;
+    }
+
+    .delete-card {
+      background: var(--white); border-radius: var(--radius-xl);
+      width: 100%; max-width: 580px; box-shadow: var(--shadow-lg); overflow: hidden;
+    }
+
+    .delete-header { padding: 32px 36px 0; }
+    .delete-icon-box {
+      width: 56px; height: 56px; border-radius: var(--radius-lg);
+      background: rgba(255,71,87,0.08); display: flex; align-items: center; justify-content: center;
+      font-size: 26px; margin-bottom: 18px;
+    }
+    .delete-title { font-family: 'Georgia', serif; font-size: 25px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; }
+    .delete-sub { font-size: 14px; color: var(--text-muted); line-height: 1.7; margin-bottom: 4px; }
+
+    .delete-body { padding: 26px 36px 36px; }
+
+    .consequence-list { display: flex; flex-direction: column; gap: 10px; margin: 18px 0 22px; }
+    .consequence-item {
+      display: flex; align-items: flex-start; gap: 10px;
+      background: rgba(255,71,87,0.04); border: 1px solid rgba(255,71,87,0.15);
+      border-radius: var(--radius-md); padding: 12px 14px; font-size: 13px; color: var(--text-secondary); line-height: 1.6;
+    }
+
+    .timeline-box {
+      background: var(--off-white); border-radius: var(--radius-lg); padding: 18px;
+      margin-bottom: 22px;
+    }
+    .timeline-box-title { font-size: 12.5px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px; }
+    .timeline-step { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
+    .timeline-step:last-child { margin-bottom: 0; }
+    .timeline-step-num { width: 22px; height: 22px; border-radius: 50%; background: var(--electric); color: white; font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .timeline-step-text { font-size: 12.5px; color: var(--text-secondary); line-height: 1.6; padding-top: 2px; }
+
+    .reason-options { display: flex; flex-direction: column; gap: 8px; margin-bottom: 18px; }
+    .reason-option { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1.5px solid var(--border-card); border-radius: var(--radius-md); cursor: pointer; transition: var(--transition); }
+    .reason-option:hover { border-color: rgba(255,71,87,0.3); }
+    .reason-option input { accent-color: var(--danger); }
+    .reason-option-label { font-size: 13px; color: var(--text-primary); }
+
+    .confirm-phrase-box { background: rgba(255,71,87,0.04); border: 1px solid rgba(255,71,87,0.2); border-radius: var(--radius-md); padding: 16px; margin-bottom: 18px; }
+    .confirm-phrase-code { font-family: monospace; font-weight: 700; background: var(--white); padding: 2px 8px; border-radius: 4px; border: 1px solid var(--border-card); }
+
+    .success-state { display: none; text-align: center; padding: 20px 0; }
+    .success-state.show { display: block; }
+    .success-state-icon { font-size: 48px; margin-bottom: 14px; }
+    .form-panel.hidden-panel { display: none; }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <a href="index.html" class="nav-logo">
+      <svg class="nav-logo-icon" viewBox="0 0 36 36" fill="none">
+        <path d="M18 3 L5 9 L5 21 Q5 30 18 34 Q31 30 31 21 L31 9 Z" fill="#0f1f3d" stroke="#3d9eff" stroke-width="1.5"/>
+        <path d="M18 10 Q13 15 13 20 Q13 25 18 28 Q23 25 23 20 Q23 15 18 10Z" fill="#3d9eff" opacity="0.9"/>
+        <circle cx="18" cy="22" r="3.5" fill="white"/>
+      </svg>
+      <div class="nav-logo-text"><span class="nav-logo-name">curaah</span><span class="nav-logo-tag">AI Health Companion</span></div>
+    </a>
+    <div class="nav-actions">
+      <a href="dashboard.html" class="btn btn-ghost btn-sm">← Back to Dashboard</a>
+    </div>
+  </nav>
+
+  <div class="delete-page">
+    <div class="delete-card">
+
+      <!-- ═══════ FORM PANEL ═══════ -->
+      <div class="form-panel" id="formPanel">
+        <div class="delete-header">
+          <div class="delete-icon-box">🗑️</div>
+          <div class="delete-title">Delete your Curaah account</div>
+          <p class="delete-sub">We're sorry to see you go. Please read this carefully before continuing — this action is permanent.</p>
+        </div>
+
+        <div class="delete-body">
+
+          <div style="font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:6px;">What this means:</div>
+          <div class="consequence-list">
+            <div class="consequence-item">🚫 Your account, profile, and login will be permanently disabled</div>
+            <div class="consequence-item">📋 All prescriptions, medicines, adherence logs, and lab reports will be permanently deleted</div>
+            <div class="consequence-item">👨‍👩‍👧 Family members will lose access to your data immediately, and any pending invites will be cancelled</div>
+            <div class="consequence-item">🤖 Your AI Companion conversation history will be permanently erased</div>
+            <div class="consequence-item">↩️ This cannot be undone once processing is complete</div>
+          </div>
+
+          <div class="timeline-box">
+            <div class="timeline-box-title">⏱️ What happens after you submit this request</div>
+            <div class="timeline-step">
+              <div class="timeline-step-num">1</div>
+              <div class="timeline-step-text">Your request is recorded immediately and your account is deactivated — you won't be able to log in.</div>
+            </div>
+            <div class="timeline-step">
+              <div class="timeline-step-num">2</div>
+              <div class="timeline-step-text">Within 30 days (as required by the DPDP Act, 2023), all your personal data is permanently deleted from our systems.</div>
+            </div>
+            <div class="timeline-step">
+              <div class="timeline-step-num">3</div>
+              <div class="timeline-step-text">You'll receive a confirmation email once deletion is fully complete.</div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Why are you leaving? <span style="color:var(--text-muted);font-weight:400;">(optional, helps us improve)</span></label>
+            <div class="reason-options">
+              <label class="reason-option"><input type="radio" name="reason" value="not_useful" /> <span class="reason-option-label">It wasn't useful for me</span></label>
+              <label class="reason-option"><input type="radio" name="reason" value="privacy_concerns" /> <span class="reason-option-label">I have privacy concerns</span></label>
+              <label class="reason-option"><input type="radio" name="reason" value="found_alternative" /> <span class="reason-option-label">Found a different solution</span></label>
+              <label class="reason-option"><input type="radio" name="reason" value="too_complicated" /> <span class="reason-option-label">Too complicated to use</span></label>
+              <label class="reason-option"><input type="radio" name="reason" value="other" /> <span class="reason-option-label">Other</span></label>
+            </div>
+            <textarea class="form-input form-textarea" id="reasonNote" placeholder="Anything else you'd like to share? (optional)" rows="2"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Confirm your password</label>
+            <input class="form-input" type="password" id="confirmPassword" placeholder="Enter your password" />
+          </div>
+
+          <div class="confirm-phrase-box">
+            <p style="font-size:13px;color:var(--text-secondary);margin-bottom:10px;">
+              To confirm, please type <span class="confirm-phrase-code">DELETE MY ACCOUNT</span> below:
+            </p>
+            <input class="form-input" type="text" id="confirmPhrase" placeholder="Type the phrase exactly" />
+          </div>
+
+          <div style="display:flex;gap:10px;">
+            <a href="dashboard.html" class="btn btn-secondary btn-full">Cancel, Keep My Account</a>
+            <button class="btn btn-danger btn-full" id="deleteBtn" onclick="submitDeletion()">Delete My Account</button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ═══════ SUCCESS STATE ═══════ -->
+      <div class="success-state" id="successState">
+        <div class="delete-body">
+          <div class="success-state-icon">✅</div>
+          <div class="delete-title" style="text-align:center;">Deletion request received</div>
+          <p class="delete-sub" style="text-align:center;">
+            Your account has been deactivated, and your data will be permanently deleted within
+            30 days, as required under the DPDP Act, 2023. You'll receive a confirmation once it's
+            fully complete. We're sorry to see you go.
+          </p>
+          <a href="index.html" class="btn btn-primary btn-full" style="margin-top:20px;">Return to Homepage</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="js/main.js"></script>
+  <script type="module">
+    import { supabase, signOutUser } from './js/supabase.js';
+
+    let currentUser = null;
+
+    async function init() {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) { window.location.href = 'login.html'; return; }
+
+      const { data: profile } = await supabase.from('users').select('*').eq('id', session.user.id).single();
+      currentUser = profile;
+    }
+
+    window.submitDeletion = async function () {
+      const password = document.getElementById('confirmPassword').value;
+      const phrase = document.getElementById('confirmPhrase').value.trim();
+      const reasonRadio = document.querySelector('input[name="reason"]:checked');
+      const reasonNote = document.getElementById('reasonNote').value.trim();
+
+      if (!password) {
+        showToast('Please enter your password to confirm.', 'error');
+        return;
+      }
+      if (phrase !== 'DELETE MY ACCOUNT') {
+        showToast('Please type the confirmation phrase exactly as shown.', 'error');
+        return;
+      }
+
+      const btn = document.getElementById('deleteBtn');
+      btn.textContent = 'Verifying...';
+      btn.disabled = true;
+
+      try {
+        // Re-verify password before proceeding with something this destructive
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email: currentUser.email,
+          password,
+        });
+
+        if (signInError) {
+          throw new Error('Incorrect password. Please try again.');
+        }
+
+        const reasonText = [reasonRadio?.value, reasonNote].filter(Boolean).join(' — ');
+
+        // Create the deletion request record (30-day SLA, per DPDP Act)
+        const { error: requestError } = await supabase.from('deletion_requests').insert({
+          user_id: currentUser.id,
+          reason: reasonText || null,
+          status: 'pending',
+        });
+
+        if (requestError) throw new Error(requestError.message);
+
+        // Deactivate the account immediately so it can no longer be used to log in
+        await supabase.from('users').update({ is_active: false }).eq('id', currentUser.id);
+
+        // Log this as a consent action for the audit trail
+        await supabase.from('consent_audit_log').insert({
+          user_id: currentUser.id,
+          action: 'revoked',
+          consent_type: 'account_deletion_requested',
+          old_value: true,
+          new_value: false,
+          user_agent: navigator.userAgent,
+        });
+
+        await signOutUser();
+
+        document.getElementById('formPanel').classList.add('hidden-panel');
+        document.getElementById('successState').classList.add('show');
+
+      } catch (err) {
+        btn.textContent = 'Delete My Account';
+        btn.disabled = false;
+        showToast(err.message || 'Something went wrong. Please try again or email curaahtech@gmail.com.', 'error');
+      }
+    };
+
+    init();
+  </script>
+
+</body>
+</html>
