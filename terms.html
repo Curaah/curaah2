@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Terms of Service — Curaah</title>
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg" />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    body { background: var(--off-white); }
+
+    .policy-hero { background: var(--navy); padding: calc(var(--nav-height) + 48px) 6% 48px; text-align: center; }
+    .policy-hero-tag { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--electric); margin-bottom: 12px; }
+    .policy-hero-title { font-family: 'Georgia', serif; font-size: clamp(28px, 4vw, 42px); font-weight: 700; color: var(--white); margin-bottom: 12px; }
+    .policy-hero-sub { font-size: 15px; color: var(--text-on-dark-muted); max-width: 580px; margin: 0 auto; line-height: 1.7; }
+    .policy-hero-date { margin-top: 16px; font-size: 12px; color: rgba(255,255,255,0.4); }
+
+    .policy-content { max-width: 780px; margin: 0 auto; padding: 56px 6%; }
+    .policy-section { margin-bottom: 46px; }
+    .policy-section-num { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--electric); margin-bottom: 8px; }
+    .policy-section-title { font-family: 'Georgia', serif; font-size: 21px; font-weight: 700; color: var(--text-primary); margin-bottom: 16px; }
+    .policy-text { font-size: 15px; color: var(--text-secondary); line-height: 1.85; margin-bottom: 16px; }
+    .policy-text:last-child { margin-bottom: 0; }
+
+    .policy-list { list-style: none; padding: 0; margin: 0 0 16px; display: flex; flex-direction: column; gap: 10px; }
+    .policy-list li { display: flex; align-items: flex-start; gap: 10px; font-size: 15px; color: var(--text-secondary); line-height: 1.7; }
+    .policy-list li::before { content: '•'; color: var(--electric); font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+
+    .policy-highlight { background: rgba(61,158,255,0.05); border: 1px solid rgba(61,158,255,0.15); border-left: 3px solid var(--electric); border-radius: 0 var(--radius-md) var(--radius-md) 0; padding: 16px 20px; margin-bottom: 16px; font-size: 14px; color: var(--text-secondary); line-height: 1.7; }
+    .policy-highlight strong { color: var(--text-primary); }
+
+    .policy-danger { background: rgba(255,71,87,0.05); border: 1px solid rgba(255,71,87,0.2); border-left: 3px solid var(--danger); border-radius: 0 var(--radius-md) var(--radius-md) 0; padding: 18px 20px; margin-bottom: 16px; font-size: 14px; color: var(--text-secondary); line-height: 1.7; }
+    .policy-danger strong { color: var(--text-primary); }
+
+    .policy-divider { height: 1px; background: var(--border-card); margin: 46px 0; }
+
+    .policy-toc { background: var(--white); border: 1px solid var(--border-card); border-radius: var(--radius-lg); padding: 24px; margin-bottom: 46px; }
+    .policy-toc-title { font-size: 13px; font-weight: 700; color: var(--text-primary); margin-bottom: 14px; letter-spacing: 0.5px; text-transform: uppercase; }
+    .policy-toc-list { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .policy-toc-list li a { font-size: 13.5px; color: var(--electric); text-decoration: none; }
+    .policy-toc-list li a:hover { text-decoration: underline; }
+
+    .contact-box { background: var(--navy); border-radius: var(--radius-lg); padding: 32px; text-align: center; }
+    .contact-box-title { font-family: 'Georgia', serif; font-size: 22px; font-weight: 700; color: var(--white); margin-bottom: 10px; }
+    .contact-box-desc { font-size: 14px; color: var(--text-on-dark-muted); line-height: 1.7; margin-bottom: 20px; }
+    .contact-box-email { font-size: 16px; font-weight: 600; color: var(--electric); }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <a href="index.html" class="nav-logo">
+      <svg class="nav-logo-icon" viewBox="0 0 36 36" fill="none">
+        <path d="M18 3 L5 9 L5 21 Q5 30 18 34 Q31 30 31 21 L31 9 Z" fill="#0f1f3d" stroke="#3d9eff" stroke-width="1.5"/>
+        <path d="M18 10 Q13 15 13 20 Q13 25 18 28 Q23 25 23 20 Q23 15 18 10Z" fill="#3d9eff" opacity="0.9"/>
+        <circle cx="18" cy="22" r="3.5" fill="white"/>
+      </svg>
+      <div class="nav-logo-text"><span class="nav-logo-name">curaah</span><span class="nav-logo-tag">AI Health Companion</span></div>
+    </a>
+    <ul class="nav-links"><li><a href="index.html">Home</a></li></ul>
+    <div class="nav-actions">
+      <a href="login.html" class="btn btn-ghost btn-sm">Login</a>
+      <a href="register.html" class="btn btn-primary btn-sm">Start Free</a>
+    </div>
+  </nav>
+
+  <section class="policy-hero">
+    <div class="policy-hero-tag">Legal</div>
+    <h1 class="policy-hero-title">Terms of Service</h1>
+    <p class="policy-hero-sub">
+      Plain-language terms for using Curaah. Please read Section 1 and Section 9 carefully —
+      they explain exactly what Curaah is, and what it is not.
+    </p>
+    <div class="policy-hero-date">Last updated: May 2026 · Version 1.0</div>
+  </section>
+
+  <div class="policy-content">
+
+    <div class="policy-toc">
+      <div class="policy-toc-title">Contents</div>
+      <ul class="policy-toc-list">
+        <li><a href="#what-curaah-is">1. What Curaah Is (and Is Not)</a></li>
+        <li><a href="#eligibility">2. Who Can Use Curaah</a></li>
+        <li><a href="#accounts">3. Your Account</a></li>
+        <li><a href="#prescriptions">4. Prescriptions & Medicines</a></li>
+        <li><a href="#ai-companion">5. The AI Companion</a></li>
+        <li><a href="#family-sos">6. Family Sharing & SOS</a></li>
+        <li><a href="#subscriptions">7. Subscriptions & Billing</a></li>
+        <li><a href="#prohibited">8. Prohibited Uses</a></li>
+        <li><a href="#medical-disclaimer">9. Medical Disclaimer</a></li>
+        <li><a href="#liability">10. Limitation of Liability</a></li>
+        <li><a href="#ip">11. Intellectual Property</a></li>
+        <li><a href="#termination">12. Termination</a></li>
+        <li><a href="#law">13. Governing Law</a></li>
+        <li><a href="#changes">14. Changes to These Terms</a></li>
+        <li><a href="#contact">15. Contact Us</a></li>
+      </ul>
+    </div>
+
+    <div class="policy-highlight">
+      <strong>The most important things to know:</strong> Curaah is a companion app, not a hospital,
+      doctor, or pharmacy. AI gives general guidance, not diagnosis or prescriptions. Always consult
+      a real doctor for medical decisions, and call emergency services directly in an emergency.
+    </div>
+
+    <!-- 1 -->
+    <div class="policy-section" id="what-curaah-is">
+      <div class="policy-section-num">Section 01</div>
+      <div class="policy-section-title">What Curaah Is (and Is Not)</div>
+      <p class="policy-text">Curaah is an <strong>AI-powered health and medication adherence companion</strong> operated by Curaah HealthTech Pvt Ltd.</p>
+      <p class="policy-text">Curaah <strong>is:</strong></p>
+      <ul class="policy-list">
+        <li>A tool to organise your prescriptions, medicines, and lab reports in one place</li>
+        <li>An adherence tracker that reminds you and understands why doses get missed</li>
+        <li>An AI companion that explains your health information in plain language</li>
+        <li>A way for trusted family members to stay informed, with your consent</li>
+        <li>An emergency SOS tool to alert your chosen contacts quickly</li>
+      </ul>
+      <p class="policy-text">Curaah <strong>is not:</strong></p>
+      <ul class="policy-list">
+        <li>A hospital, clinic, pharmacy, or licensed healthcare provider</li>
+        <li>A diagnostic or prescribing service</li>
+        <li>An emergency response service — Curaah's SOS notifies your own contacts; it does not replace calling 112 or local emergency services</li>
+        <li>A substitute for your doctor's medical judgment</li>
+      </ul>
+      <div class="policy-danger">
+        <strong>In a medical emergency, call 112 (India) or go directly to the nearest hospital. Do not rely on Curaah's SOS feature alone in a life-threatening situation.</strong>
+      </div>
+    </div>
+
+    <div class="policy-divider"></div>
+
+    <!-- 2 -->
+    <div class="policy-section" id="eligibility">
+      <div class="policy-section-num">Section 02</div>
+      <div class="policy-section-title">Who Can Use Curaah</div>
+      <ul class="policy-list">
+        <li>You must be 18 years or older to create a Curaah account</li>
+        <li>You must provide accurate information about yourself and your health history</li>
+        <li>Parents/guardians may manage a minor's medication under their own account, taking responsibility for that data</li>
+        <li>Curaah is currently designed for use within India, in Hindi, Punjabi, or English</li>
+      </ul>
+    </div>
+
+    <div class="policy-divider"></div>
+
+    <!-- 3 -->
+    <div class="policy-section" id="accounts">
+      <div class="policy-section-num">Section 03</div>
+      <div class="policy-section-title">Your Account</div>
+      <ul class="policy-list">
+        <li>You are responsible for keeping your password confidential</li>
+        <li>You are responsible for activity that happens under your account</li>
+        <li>One person, one account — please don't create duplicate accounts</li>
+        <li>Notify us immediately at curaahtech@gmail.com if you suspect unauthorised access</li>
+      </ul>
+    </div>
+
+    <div class="policy-divider"></div>
+
+    <!-- 4 -->
+    <div class="policy-section" id="prescriptions">
+      <div class="policy-section-num">Section 04</div>
+      <div class="policy-section-title">Prescriptions & Medicines</div>
+      <ul class="policy-list">
+        <li>When you upload a prescription, AI extracts medicines, dosages, and timings automatically</li>
+        <li>This extraction is reviewed by a verified pharmacist before it becomes your active medication plan, because handwritten prescriptions can be misread</li>
+        <li>You remain responsible for confirming your medication plan matches what your doctor actually prescribed</li>
+        <li>Medicine identification via photo (strip or tablet) is provided as a helpful check, not a guarantee — when in doubt, consult your pharmacist or doctor directly</li>
+        <li>Drug interaction alerts are informational flags, not a complete clinical safety check — always inform every doctor you see about all medicines you're taking</li>
+      </ul>
+    </div>
+
+    <div class="policy-divider"></div>
+
+    <!-- 5 -->
+    <div class="policy-section" id="ai-companion">
+      <div class="policy-section-num">Section 05</div>
+      <div class="policy-section-title">The AI Companion</div>
+      <ul class="policy-list">
+        <li>The AI Companion uses a snapshot of your health profile to answer your questions more relevantly</li>
+        <li>Responses are general guidance based on patterns in your data — they are not a diagnosis, prescription, or substitute for professional medical advice</li>
+        <li>Every AI response includes a disclaimer reminding you to consult a doctor for medical decisions</li>
+        <li>If the AI detects language suggesting a medical emergency, it will direct you to call emergency services — it cannot itself dispatch help</li>
+        <li>Do not rely on the AI Companion for time-critical or life-threatening situations</li>
+      </ul>
+    </div>
+
+    <div class="policy-divider"></div>
+
+    <!-- 6 -->
+    <div class="policy-section" id="family-sos">
+      <div class="policy-section-num">Section 06</div>
+      <div class="policy-section-title">Family Sharing & SOS</div>
+      <ul class="policy-list">
+        <li>You control who you invite as a family member, and exactly what they can see — nothing is shared without your action</li>
+        <li>You are responsible for ensuring the people you invite or add as emergency contacts are real, trusted individuals</li>
+        <li>SOS sends notifications to the contacts and channels you've configured — actual delivery depends on network connectivity, SMS/WhatsApp service availability, and contact responsiveness, none of which Curaah can guarantee</li>
+        <li>Misusing the family/SOS system (e.g. impersonating a family member, accessing another patient's data without authorisation) will result in account suspension</li>
+      </ul>
+    </div>
+
+    <div class="policy-divider"></div>
+
+    <!-- 7 -->
+    <div class="policy-section" id="subscriptions">
+      <div class="policy-section-num">Section 07</div>
+      <div class="policy-section-title">Subscriptions & Billing</div>
+      <ul class="policy-list">
+        <li>Curaah's free tier remains free with no hidden charges</li>
+        <li>Paid plans (Curaah Care, Family, NRI) are billed on a recurring monthly basis until cancelled</li>
+        <li>You can cancel a paid plan anytime; you'll retain access until the end of the current billing period</li>
+        <li>Prices are shown in the app at the time of purchase and may change with advance notice</li>
+        <li>We do not store your full payment card details — payments are processed via a secure third-party payment gateway</li>
+      </ul>
+    </div>
+
+    <div class="policy-divider"></div>
+
+    <!-- 8 -->
+    <div class="policy-section" id="prohibited">
+      <div class="policy-section-num">Section 08</div>
+      <div class="policy-section-title">Prohibited Uses</div>
+      <p class="policy-text">You agree not to:</p>
+      <ul class="policy-list">
+        <li>Upload false, misleading, or someone else's health information without authorisation</li>
+        <li>Attempt to access another user's account or health data</li>
+        <li>Use Curaah to harass, impersonate, or deceive another person</li>
+        <li>Reverse-engineer, scrape, or attempt to extract data from the platform using automated tools</li>
+        <li>Use Curaah for any purpose that violates Indian law, including the IT Act 2000 and DPDP Act 2023</li>
+        <li>Resell, white-label, or redistribute Curaah's services without written permission</li>
+      </ul>
+      <p class="policy-text">Violations may result in immediate suspension and, where appropriate, referral to authorities.</p>
+    </div>
+
+    <div class="policy-divider"></div>
+
+    <!-- 9 -->
+    <div class="policy-section" id="medical-disclaimer">
+      <div class="policy-section-num">Section 09</div>
+      <div class="policy-section-title">Medical Disclaimer</div>
+      <div class="policy-danger">
+        <strong>Curaah does not provide medical advice, diagnosis, or treatment.</strong>
+      </div>
+      <p class="policy-text">
+        All content in Curaah — including AI Companion responses, lab report explanations,
+        medicine identification, and Recovery Score insights — is for general informational and
+        organisational purposes only. It is not a substitute for professional medical judgment.
+      </p>
+      <p class="policy-text">
+        Always consult a qualified, licensed doctor before making any decision about your treatment,
+        medication, or health. Never stop, start, or change a medicine based solely on something
+        Curaah tells you.
+      </p>
+      <p class="policy-text">
+        If you are experiencing a medical emergency, do not use Curaah. Call 112 or go to your
+        nearest hospital emergency department immediately.
+      </p>
+    </div>
+
+    <div class="policy-divider"></div>
+
+    <!-- 10 -->
+    <div class="policy-section" id="liability">
+      <div class="policy-section-num">Section 10</div>
+      <div class="policy-section-title">Limitation of Liability</div>
+      <p class="policy-text">To the maximum extent permitted by Indian law, Curaah HealthTech Pvt Ltd is not liable for:</p>
+      <ul class="policy-list">
+        <li>Any medical outcome, misdiagnosis, or treatment decision, whether or not informed by Curaah</li>
+        <li>Errors in AI-generated extractions, explanations, or identifications, even after pharmacist review</li>
+        <li>Delayed, failed, or undelivered SOS notifications due to network, carrier, or third-party service issues</li>
+        <li>Service interruptions, downtime, or data loss due to technical failure</li>
+        <li>Indirect, incidental, or consequential damages arising from use of the platform</li>
+      </ul>
+      <p class="policy-text">
+        Our total liability to any user in connection with the platform shall not exceed the amount
+        you paid us in the 12 months preceding the claim (zero, for free-tier users).
+      </p>
+    </div>
+
+    <div class="policy-divider"></div>
+
+    <!-- 11 -->
+    <div class="policy-section" id="ip">
+      <div class="policy-section-num">Section 11</div>
+      <div class="policy-section-title">Intellectual Property</div>
+      <p class="policy-text">
+        The Curaah name, logo, design, Recovery Score methodology, and platform code are owned by
+        Curaah HealthTech Pvt Ltd. You may not copy, reproduce, or redistribute any part of the
+        platform without written permission.
+      </p>
+      <p class="policy-text">
+        Your health data remains yours. By using Curaah, you grant us a limited licence to store
+        and process it solely to provide you the service described in this document and our
+        Privacy Policy.
+      </p>
+    </div>
+
+    <div class="policy-divider"></div>
+
+    <!-- 12 -->
+    <div class="policy-section" id="termination">
+      <div class="policy-section-num">Section 12</div>
+      <div class="policy-section-title">Termination</div>
+      <p class="policy-text"><strong>You</strong> may delete your account anytime via the Delete My Data page; we complete deletion within 30 days.</p>
+      <p class="policy-text"><strong>We</strong> may suspend or terminate accounts that violate these terms, provide false information, or misuse family/SOS features. We'll provide notice where reasonably possible.</p>
+    </div>
+
+    <div class="policy-divider"></div>
+
+    <!-- 13 -->
+    <div class="policy-section" id="law">
+      <div class="policy-section-num">Section 13</div>
+      <div class="policy-section-title">Governing Law</div>
+      <p class="policy-text">
+        These terms are governed by the laws of India. Disputes are subject to the jurisdiction
+        of courts in Punjab, India. Relevant laws include the Information Technology Act 2000, the
+        Digital Personal Data Protection Act 2023, and the Consumer Protection Act 2019.
+      </p>
+    </div>
+
+    <div class="policy-divider"></div>
+
+    <!-- 14 -->
+    <div class="policy-section" id="changes">
+      <div class="policy-section-num">Section 14</div>
+      <div class="policy-section-title">Changes to These Terms</div>
+      <p class="policy-text">
+        We may update these terms as Curaah evolves. The date at the top shows the last update.
+        For material changes, we'll notify you at least 7 days in advance. Continuing to use
+        Curaah after an update means you accept the revised terms.
+      </p>
+    </div>
+
+    <div class="policy-divider"></div>
+
+    <!-- 15 -->
+    <div class="policy-section" id="contact">
+      <div class="policy-section-num">Section 15</div>
+      <div class="policy-section-title">Contact Us</div>
+      <div class="contact-box">
+        <div class="contact-box-title">Get in Touch</div>
+        <p class="contact-box-desc">We respond to all emails within 7 days.<br/>For account or billing issues, mention "URGENT" in your subject line.</p>
+        <div class="contact-box-email">curaahtech@gmail.com</div>
+        <p style="font-size:12px;color:var(--text-on-dark-muted);margin-top:12px;">Curaah HealthTech Pvt Ltd · Nangal, Punjab 140124 · India</p>
+      </div>
+    </div>
+
+  </div>
+
+  <footer class="footer">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand-name">
+          <svg width="26" height="26" viewBox="0 0 36 36" fill="none">
+            <path d="M18 3 L5 9 L5 21 Q5 30 18 34 Q31 30 31 21 L31 9 Z" fill="#0f1f3d" stroke="#3d9eff" stroke-width="1.5"/>
+            <path d="M18 10 Q13 15 13 20 Q13 25 18 28 Q23 25 23 20 Q23 15 18 10Z" fill="#3d9eff" opacity="0.9"/>
+            <circle cx="18" cy="22" r="3.5" fill="white"/>
+          </svg>curaah
+        </div>
+        <p class="footer-brand-desc">Your health, remembered.</p>
+        <p class="footer-built">A product of <span>Curaah HealthTech Pvt Ltd</span> · Nangal, Punjab 🇮🇳</p>
+      </div>
+      <div>
+        <div class="footer-col-title">Legal</div>
+        <ul class="footer-col-links">
+          <li><a href="privacy.html">Privacy Policy</a></li>
+          <li><a href="terms.html">Terms of Service</a></li>
+          <li><a href="consent.html">Manage Consent</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="footer-col-title">Contact</div>
+        <ul class="footer-col-links">
+          <li><a href="mailto:curaahtech@gmail.com">curaahtech@gmail.com</a></li>
+          <li><a href="#">Nangal, Punjab 140124</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-bottom-text">© 2026 Curaah HealthTech Pvt Ltd. All rights reserved.</p>
+      <div class="footer-bottom-links">
+        <a href="privacy.html">Privacy</a>
+        <a href="terms.html">Terms</a>
+        <a href="delete-account.html">Delete My Data</a>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
