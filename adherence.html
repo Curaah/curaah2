@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Adherence Log — Curaah</title>
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg" />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    body { background: var(--off-white); min-height: 100vh; }
+    .dashboard-layout { display: flex; min-height: 100vh; padding-top: var(--nav-height); }
+
+    .sidebar {
+      width: 252px; flex-shrink: 0; background: var(--navy);
+      border-right: 1px solid var(--border-dark);
+      position: fixed; top: var(--nav-height); left: 0; bottom: 0;
+      display: flex; flex-direction: column; overflow-y: auto; z-index: 90;
+    }
+    .sidebar-profile { padding: 22px 18px; border-bottom: 1px solid var(--border-dark); display: flex; align-items: center; gap: 12px; }
+    .sidebar-avatar {
+      width: 42px; height: 42px; border-radius: 50%;
+      background: rgba(61,158,255,0.15); border: 2px solid var(--electric);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; font-weight: 700; color: var(--electric); flex-shrink: 0;
+    }
+    .sidebar-profile-name { font-size: 14px; font-weight: 600; color: var(--white); margin-bottom: 2px; }
+    .sidebar-profile-tag  { font-size: 11px; color: var(--text-on-dark-muted); }
+    .sidebar-nav { padding: 14px 10px; flex: 1; display: flex; flex-direction: column; gap: 2px; }
+    .sidebar-section-label { font-size: 10px; font-weight: 700; letter-spacing: 1.4px; text-transform: uppercase; color: rgba(255,255,255,0.25); padding: 12px 8px 6px; }
+    .sidebar-item {
+      display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+      border-radius: var(--radius-md); font-size: 13.5px; font-weight: 500;
+      color: var(--text-on-dark-muted); cursor: pointer; transition: var(--transition);
+      border: none; background: none; width: 100%; text-align: left; text-decoration: none;
+    }
+    .sidebar-item:hover  { background: rgba(255,255,255,0.06); color: var(--white); }
+    .sidebar-item.active { background: rgba(61,158,255,0.12); color: var(--electric); font-weight: 600; }
+    .sidebar-item-icon   { font-size: 16px; width: 20px; text-align: center; flex-shrink: 0; }
+    .sidebar-sos-box { margin: 12px 10px; padding: 14px; background: rgba(255,71,87,0.1); border: 1px solid rgba(255,71,87,0.25); border-radius: var(--radius-md); text-align: center; }
+    .sidebar-sos-box button { width: 100%; background: var(--danger); color: white; font-weight: 700; font-size: 13px; padding: 10px; border-radius: var(--radius-md); }
+    .sidebar-bottom { padding: 14px 10px; border-top: 1px solid var(--border-dark); }
+
+    .dashboard-main { margin-left: 252px; flex: 1; padding: 30px 36px 60px; }
+    .dash-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 22px; flex-wrap: wrap; gap: 16px; }
+    .dash-greeting { font-size: 13px; color: var(--text-muted); margin-bottom: 4px; }
+    .dash-title    { font-family: 'Georgia', serif; font-size: 25px; font-weight: 700; color: var(--text-primary); }
+
+    /* Stats row */
+    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 22px; }
+    .stat-card { background: var(--white); border: 1px solid var(--border-card); border-radius: var(--radius-lg); padding: 18px; }
+    .stat-card-num { font-family: 'Georgia', serif; font-size: 26px; font-weight: 700; color: var(--text-primary); }
+    .stat-card-label { font-size: 11.5px; color: var(--text-muted); margin-top: 4px; }
+
+    /* Calendar */
+    .panel { background: var(--white); border: 1px solid var(--border-card); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 20px; }
+    .panel-header { padding: 17px 20px; border-bottom: 1px solid var(--border-card); display: flex; align-items: center; justify-content: space-between; }
+    .panel-title { font-size: 14.5px; font-weight: 700; color: var(--text-primary); }
+    .panel-body { padding: 18px 20px; }
+
+    .month-nav { display: flex; align-items: center; gap: 12px; }
+    .month-nav button { width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--border-card); display: flex; align-items: center; justify-content: center; font-size: 13px; }
+    .month-nav button:hover { background: var(--off-white); }
+    .month-label { font-size: 13px; font-weight: 700; color: var(--text-primary); min-width: 110px; text-align: center; }
+
+    .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+    .calendar-dow { font-size: 10.5px; font-weight: 700; color: var(--text-muted); text-align: center; padding-bottom: 6px; }
+    .calendar-cell {
+      aspect-ratio: 1; border-radius: var(--radius-md); display: flex; flex-direction: column;
+      align-items: center; justify-content: center; font-size: 12px; cursor: pointer; transition: var(--transition);
+      border: 1px solid var(--border-card); position: relative;
+    }
+    .calendar-cell.empty { border: none; cursor: default; }
+    .calendar-cell:not(.empty):hover { border-color: var(--electric); }
+    .calendar-cell-num { font-weight: 600; }
+    .calendar-cell-dot { width: 6px; height: 6px; border-radius: 50%; position: absolute; bottom: 6px; }
+    .calendar-cell.today { border-color: var(--electric); border-width: 2px; }
+    .calendar-cell.future { opacity: 0.35; cursor: default; }
+
+    .legend-row { display: flex; gap: 16px; margin-top: 14px; flex-wrap: wrap; }
+    .legend-item { display: flex; align-items: center; gap: 6px; font-size: 11.5px; color: var(--text-muted); }
+    .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+    /* Day detail */
+    .day-detail { display: none; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-card); }
+    .day-detail.show { display: block; }
+    .day-detail-title { font-size: 13.5px; font-weight: 700; color: var(--text-primary); margin-bottom: 10px; }
+    .day-detail-row { display: flex; align-items: center; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--border-card); font-size: 12.5px; }
+    .day-detail-row:last-child { border-bottom: none; }
+
+    /* Skip reasons breakdown */
+    .reason-bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+    .reason-bar-label { font-size: 12px; color: var(--text-secondary); width: 130px; flex-shrink: 0; }
+    .reason-bar-track { flex: 1; height: 8px; background: var(--off-white); border-radius: var(--radius-full); overflow: hidden; }
+    .reason-bar-fill { height: 100%; background: var(--warning); border-radius: var(--radius-full); }
+    .reason-bar-count { font-size: 11.5px; color: var(--text-muted); width: 24px; text-align: right; flex-shrink: 0; }
+
+    .panel-empty { padding: 30px 20px; text-align: center; color: var(--text-muted); font-size: 13px; }
+
+    @media (max-width: 860px) {
+      .sidebar { transform: translateX(-252px); transition: transform 0.3s; }
+      .sidebar.open { transform: translateX(0); }
+      .dashboard-main { margin-left: 0; padding: 20px; }
+      .stats-row { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <a href="index.html" class="nav-logo">
+      <svg class="nav-logo-icon" viewBox="0 0 36 36" fill="none">
+        <path d="M18 3 L5 9 L5 21 Q5 30 18 34 Q31 30 31 21 L31 9 Z" fill="#0f1f3d" stroke="#3d9eff" stroke-width="1.5"/>
+        <path d="M18 10 Q13 15 13 20 Q13 25 18 28 Q23 25 23 20 Q23 15 18 10Z" fill="#3d9eff" opacity="0.9"/>
+        <circle cx="18" cy="22" r="3.5" fill="white"/>
+      </svg>
+      <div class="nav-logo-text"><span class="nav-logo-name">curaah</span><span class="nav-logo-tag">AI Health Companion</span></div>
+    </a>
+    <ul class="nav-links"><li><a href="ai-companion.html">Ask AI</a></li></ul>
+    <div class="nav-actions">
+      <span style="font-size:13px;color:var(--text-on-dark-muted);">Hi, <strong style="color:var(--white);" id="navName">—</strong></span>
+      <button class="btn btn-ghost btn-sm" onclick="handleLogout()">Logout</button>
+    </div>
+    <div class="nav-hamburger" id="hamburger" onclick="toggleSidebar()"><span></span><span></span><span></span></div>
+  </nav>
+
+  <div class="dashboard-layout">
+
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-profile">
+        <div class="sidebar-avatar" id="sidebarAvatar">—</div>
+        <div><div class="sidebar-profile-name" id="sidebarName">Loading...</div><div class="sidebar-profile-tag" id="sidebarCity">—</div></div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="sidebar-section-label">Main</div>
+        <a class="sidebar-item" href="dashboard.html"><span class="sidebar-item-icon">🏠</span> Dashboard</a>
+        <a class="sidebar-item" href="prescriptions.html"><span class="sidebar-item-icon">📋</span> Prescriptions</a>
+        <a class="sidebar-item" href="medicines.html"><span class="sidebar-item-icon">💊</span> My Medicines</a>
+        <a class="sidebar-item active" href="adherence.html"><span class="sidebar-item-icon">📅</span> Adherence Log</a>
+        <a class="sidebar-item" href="lab-reports.html"><span class="sidebar-item-icon">📊</span> Lab Reports</a>
+        <a class="sidebar-item" href="ai-companion.html"><span class="sidebar-item-icon">🤖</span> AI Companion</a>
+        <div class="sidebar-section-label">Family & Safety</div>
+        <a class="sidebar-item" href="family.html"><span class="sidebar-item-icon">👨‍👩‍👧</span> Family Dashboard</a>
+        <a class="sidebar-item" href="recovery-score.html"><span class="sidebar-item-icon">📈</span> Recovery Score</a>
+        <div class="sidebar-section-label">Account</div>
+        <a class="sidebar-item" href="consent.html"><span class="sidebar-item-icon">🔒</span> Privacy & Consent</a>
+        <a class="sidebar-item" href="profile.html"><span class="sidebar-item-icon">👤</span> My Profile</a>
+      </nav>
+      <div class="sidebar-sos-box">
+        <div style="font-size:11px;color:var(--text-on-dark-muted);margin-bottom:8px;">In an emergency</div>
+        <button onclick="window.location.href='sos.html'">🚨 SOS</button>
+      </div>
+      <div class="sidebar-bottom">
+        <button class="sidebar-item" onclick="handleLogout()" style="color:var(--danger);"><span class="sidebar-item-icon">🚪</span> Logout</button>
+      </div>
+    </aside>
+
+    <main class="dashboard-main">
+
+      <div class="dash-header">
+        <div>
+          <div class="dash-greeting">Patterns, not judgement</div>
+          <div class="dash-title">Adherence Log</div>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-card-num" id="statTaken" style="color:var(--success);">—</div>
+          <div class="stat-card-label">Taken (30 days)</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-num" id="statSkipped" style="color:var(--danger);">—</div>
+          <div class="stat-card-label">Skipped (30 days)</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-num" id="statRate" style="color:var(--electric);">—</div>
+          <div class="stat-card-label">Adherence Rate</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-num" id="statStreak" style="color:var(--warning);">—</div>
+          <div class="stat-card-label">Current Streak</div>
+        </div>
+      </div>
+
+      <!-- Calendar -->
+      <div class="panel">
+        <div class="panel-header">
+          <div class="panel-title">📅 Calendar</div>
+          <div class="month-nav">
+            <button onclick="changeMonth(-1)">←</button>
+            <span class="month-label" id="monthLabel">—</span>
+            <button onclick="changeMonth(1)">→</button>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="calendar-grid" id="calendarDow"></div>
+          <div class="calendar-grid" id="calendarGrid" style="margin-top:6px;"></div>
+
+          <div class="legend-row">
+            <div class="legend-item"><span class="legend-dot" style="background:var(--success);"></span> All taken</div>
+            <div class="legend-item"><span class="legend-dot" style="background:var(--warning);"></span> Partial</div>
+            <div class="legend-item"><span class="legend-dot" style="background:var(--danger);"></span> Mostly skipped</div>
+            <div class="legend-item"><span class="legend-dot" style="background:var(--border-card);"></span> No data</div>
+          </div>
+
+          <div class="day-detail" id="dayDetail">
+            <div class="day-detail-title" id="dayDetailTitle">—</div>
+            <div id="dayDetailRows"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Skip reasons -->
+      <div class="panel">
+        <div class="panel-header"><div class="panel-title">🤔 Why Doses Get Skipped (Last 30 Days)</div></div>
+        <div class="panel-body" id="skipReasonsBody">
+          <div class="panel-empty">Loading...</div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script src="js/main.js"></script>
+  <script type="module">
+    import { supabase, requireAuth, signOutUser } from './js/supabase.js';
+
+    let currentUser = null;
+    let viewMonth = new Date();
+    let allLogs = [];
+
+    const reasonLabels = {
+      forgot: 'Forgot',
+      side_effects: 'Side effects',
+      medicine_unavailable: 'Medicine unavailable',
+      doctor_advised_stop: 'Doctor advised stop',
+      financial_reason: 'Financial reason',
+      felt_better: 'Felt better',
+      travelling: 'Travelling',
+      other: 'Other',
+    };
+
+    async function init() {
+      const session = await requireAuth('login.html');
+      if (!session) return;
+
+      const { data: profile } = await supabase.from('users').select('*').eq('id', session.user.id).single();
+      if (!profile) return;
+      currentUser = profile;
+
+      document.getElementById('navName').textContent       = (profile.full_name || '').split(' ')[0] || '—';
+      document.getElementById('sidebarName').textContent   = profile.full_name || '—';
+      document.getElementById('sidebarAvatar').textContent = getInitials(profile.full_name);
+      document.getElementById('sidebarCity').textContent   = profile.city || 'India';
+
+      renderDowHeader();
+      await loadStats();
+      await loadCalendar();
+      await loadSkipReasons();
+    }
+
+    function renderDowHeader() {
+      const dows = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+      document.getElementById('calendarDow').innerHTML = dows.map(d => `<div class="calendar-dow">${d}</div>`).join('');
+    }
+
+    async function loadStats() {
+      const start = new Date();
+      start.setDate(start.getDate() - 29);
+      const startStr = start.toLocaleDateString('en-CA');
+
+      const { data } = await supabase
+        .from('adherence_logs')
+        .select('*')
+        .eq('user_id', currentUser.id)
+        .gte('scheduled_date', startStr)
+        .order('scheduled_date', { ascending: false });
+
+      allLogs = data || [];
+
+      const taken = allLogs.filter(l => l.status === 'taken').length;
+      const skipped = allLogs.filter(l => l.status === 'skipped').length;
+      const total = allLogs.length;
+      const rate = total > 0 ? Math.round((taken / total) * 100) : 0;
+
+      document.getElementById('statTaken').textContent = taken;
+      document.getElementById('statSkipped').textContent = skipped;
+      document.getElementById('statRate').textContent = total > 0 ? rate + '%' : '—';
+
+      // Current streak — consecutive days with 100% adherence, counting back from today
+      const byDate = {};
+      allLogs.forEach(l => {
+        if (!byDate[l.scheduled_date]) byDate[l.scheduled_date] = { taken: 0, total: 0 };
+        byDate[l.scheduled_date].total++;
+        if (l.status === 'taken') byDate[l.scheduled_date].taken++;
+      });
+
+      let streak = 0;
+      let cursor = new Date();
+      while (true) {
+        const key = cursor.toLocaleDateString('en-CA');
+        const day = byDate[key];
+        if (!day || day.taken !== day.total) break;
+        streak++;
+        cursor.setDate(cursor.getDate() - 1);
+      }
+      document.getElementById('statStreak').textContent = streak > 0 ? `${streak} day${streak > 1 ? 's' : ''}` : '—';
+    }
+
+    window.changeMonth = function (delta) {
+      viewMonth.setMonth(viewMonth.getMonth() + delta);
+      loadCalendar();
+    };
+
+    async function loadCalendar() {
+      const year = viewMonth.getFullYear();
+      const month = viewMonth.getMonth();
+
+      document.getElementById('monthLabel').textContent =
+        viewMonth.toLocaleDateString('en-IN', { month: 'long', year: 'numeric' });
+
+      const firstDay = new Date(year, month, 1);
+      const lastDay = new Date(year, month + 1, 0);
+      const startStr = firstDay.toLocaleDateString('en-CA');
+      const endStr = lastDay.toLocaleDateString('en-CA');
+
+      const { data } = await supabase
+        .from('adherence_logs')
+        .select('*')
+        .eq('user_id', currentUser.id)
+        .gte('scheduled_date', startStr)
+        .lte('scheduled_date', endStr);
+
+      const byDate = {};
+      (data || []).forEach(l => {
+        if (!byDate[l.scheduled_date]) byDate[l.scheduled_date] = [];
+        byDate[l.scheduled_date].push(l);
+      });
+
+      const todayStr = getTodayLocal();
+      const cells = [];
+      const startWeekday = firstDay.getDay();
+
+      for (let i = 0; i < startWeekday; i++) cells.push('<div class="calendar-cell empty"></div>');
+
+      for (let day = 1; day <= lastDay.getDate(); day++) {
+        const dateObj = new Date(year, month, day);
+        const dateStr = dateObj.toLocaleDateString('en-CA');
+        const logs = byDate[dateStr] || [];
+        const isToday = dateStr === todayStr;
+        const isFuture = dateStr > todayStr;
+
+        let dotColor = null;
+        if (logs.length > 0) {
+          const taken = logs.filter(l => l.status === 'taken').length;
+          const ratio = taken / logs.length;
+          dotColor = ratio === 1 ? 'var(--success)' : ratio > 0 ? 'var(--warning)' : 'var(--danger)';
+        }
+
+        cells.push(`
+          <div class="calendar-cell ${isToday ? 'today' : ''} ${isFuture ? 'future' : ''}" onclick="${isFuture ? '' : `showDayDetail('${dateStr}')`}">
+            <span class="calendar-cell-num">${day}</span>
+            ${dotColor ? `<span class="calendar-cell-dot" style="background:${dotColor};"></span>` : ''}
+          </div>`);
+      }
+
+      document.getElementById('calendarGrid').innerHTML = cells.join('');
+      document.getElementById('dayDetail').classList.remove('show');
+    }
+
+    window.showDayDetail = async function (dateStr) {
+      const { data } = await supabase
+        .from('adherence_logs')
+        .select('*, medicines(name)')
+        .eq('user_id', currentUser.id)
+        .eq('scheduled_date', dateStr)
+        .order('scheduled_time');
+
+      const detail = document.getElementById('dayDetail');
+      detail.classList.add('show');
+      document.getElementById('dayDetailTitle').textContent = formatDateReadable(dateStr);
+
+      const rowsEl = document.getElementById('dayDetailRows');
+      if (!data || !data.length) {
+        rowsEl.innerHTML = `<p style="font-size:12.5px;color:var(--text-muted);">No medicine logs recorded for this day.</p>`;
+        return;
+      }
+
+      rowsEl.innerHTML = data.map(l => {
+        const statusColor = l.status === 'taken' ? 'var(--success)' : 'var(--danger)';
+        const statusIcon = l.status === 'taken' ? '✓' : '✗';
+        return `
+          <div class="day-detail-row">
+            <span style="color:${statusColor};font-weight:700;">${statusIcon}</span>
+            <span style="flex:1;">${l.medicines?.name || 'Medicine'} · ${l.scheduled_time}</span>
+            ${l.skip_reason ? `<span style="color:var(--text-muted);font-size:11.5px;">${reasonLabels[l.skip_reason] || l.skip_reason}</span>` : ''}
+          </div>`;
+      }).join('');
+
+      detail.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    };
+
+    async function loadSkipReasons() {
+      const start = new Date();
+      start.setDate(start.getDate() - 29);
+      const startStr = start.toLocaleDateString('en-CA');
+
+      const { data } = await supabase
+        .from('adherence_logs')
+        .select('skip_reason')
+        .eq('user_id', currentUser.id)
+        .eq('status', 'skipped')
+        .gte('scheduled_date', startStr)
+        .not('skip_reason', 'is', null);
+
+      const el = document.getElementById('skipReasonsBody');
+
+      if (!data || !data.length) {
+        el.innerHTML = `<div class="panel-empty">No skipped doses in the last 30 days — great consistency!</div>`;
+        return;
+      }
+
+      const counts = {};
+      data.forEach(l => { counts[l.skip_reason] = (counts[l.skip_reason] || 0) + 1; });
+
+      const maxCount = Math.max(...Object.values(counts));
+      const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+
+      el.innerHTML = sorted.map(([reason, count]) => `
+        <div class="reason-bar-row">
+          <div class="reason-bar-label">${reasonLabels[reason] || reason}</div>
+          <div class="reason-bar-track"><div class="reason-bar-fill" style="width:${(count / maxCount) * 100}%;"></div></div>
+          <div class="reason-bar-count">${count}</div>
+        </div>`).join('');
+    }
+
+    window.handleLogout = async function () {
+      await signOutUser();
+      showToast('Logged out.', 'success');
+      setTimeout(() => { window.location.href = 'index.html'; }, 600);
+    };
+
+    init();
+  </script>
+
+</body>
+</html>
