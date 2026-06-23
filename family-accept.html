@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Family Invitation — Curaah</title>
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg" />
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    body { background: var(--navy); min-height: 100vh; }
+
+    .accept-page {
+      min-height: 100vh; display: flex; align-items: center; justify-content: center;
+      padding: calc(var(--nav-height) + 24px) 5% 40px; position: relative; overflow: hidden;
+    }
+    .accept-page::before {
+      content: ''; position: absolute; top: -140px; right: -140px; width: 420px; height: 420px;
+      background: radial-gradient(circle, rgba(61,158,255,0.16), transparent 70%); border-radius: 50%;
+    }
+
+    .accept-card {
+      background: var(--white); border-radius: var(--radius-xl); padding: 40px 38px;
+      width: 100%; max-width: 460px; box-shadow: var(--shadow-lg); position: relative; z-index: 1;
+    }
+
+    .state-block { display: none; text-align: center; }
+    .state-block.show { display: block; }
+
+    .accept-logo { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 22px; }
+    .accept-logo-name { font-size: 19px; font-weight: 700; color: var(--navy); font-family: 'Georgia', serif; }
+
+    .invite-icon { font-size: 48px; margin-bottom: 16px; }
+    .accept-title { font-family: 'Georgia', serif; font-size: 22px; font-weight: 700; color: var(--text-primary); margin-bottom: 10px; }
+    .accept-sub { font-size: 14px; color: var(--text-muted); line-height: 1.7; margin-bottom: 24px; }
+
+    .invite-detail-card {
+      background: var(--off-white); border-radius: var(--radius-lg); padding: 18px;
+      text-align: left; margin-bottom: 22px;
+    }
+    .invite-detail-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-card); font-size: 13px; }
+    .invite-detail-row:last-child { border-bottom: none; }
+    .invite-detail-label { color: var(--text-muted); }
+    .invite-detail-value { color: var(--text-primary); font-weight: 600; }
+
+    .permission-list { display: flex; flex-direction: column; gap: 8px; text-align: left; margin-bottom: 22px; }
+    .permission-item { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--text-secondary); background: var(--off-white); padding: 10px 14px; border-radius: var(--radius-md); }
+
+    .auth-toggle { display: flex; gap: 0; background: var(--off-white); border-radius: var(--radius-full); padding: 3px; margin-bottom: 18px; }
+    .auth-toggle button { flex: 1; padding: 9px; font-size: 12.5px; font-weight: 600; color: var(--text-muted); border-radius: var(--radius-full); }
+    .auth-toggle button.active { background: var(--electric); color: white; }
+
+    .spinner-center { display: flex; justify-content: center; padding: 30px 0; }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <a href="index.html" class="nav-logo">
+      <svg class="nav-logo-icon" viewBox="0 0 36 36" fill="none">
+        <path d="M18 3 L5 9 L5 21 Q5 30 18 34 Q31 30 31 21 L31 9 Z" fill="#0f1f3d" stroke="#3d9eff" stroke-width="1.5"/>
+        <path d="M18 10 Q13 15 13 20 Q13 25 18 28 Q23 25 23 20 Q23 15 18 10Z" fill="#3d9eff" opacity="0.9"/>
+        <circle cx="18" cy="22" r="3.5" fill="white"/>
+      </svg>
+      <div class="nav-logo-text"><span class="nav-logo-name">curaah</span><span class="nav-logo-tag">AI Health Companion</span></div>
+    </a>
+  </nav>
+
+  <div class="accept-page">
+    <div class="accept-card">
+
+      <div class="accept-logo">
+        <svg width="28" height="28" viewBox="0 0 36 36" fill="none">
+          <path d="M18 3 L5 9 L5 21 Q5 30 18 34 Q31 30 31 21 L31 9 Z" fill="#0f1f3d" stroke="#3d9eff" stroke-width="1.5"/>
+          <path d="M18 10 Q13 15 13 20 Q13 25 18 28 Q23 25 23 20 Q23 15 18 10Z" fill="#3d9eff" opacity="0.9"/>
+          <circle cx="18" cy="22" r="3.5" fill="white"/>
+        </svg>
+        <div class="accept-logo-name">curaah</div>
+      </div>
+
+      <!-- LOADING -->
+      <div class="state-block show" id="loadingState">
+        <div class="spinner-center"><div class="spinner"></div></div>
+        <p style="text-align:center;color:var(--text-muted);font-size:13px;">Checking your invitation...</p>
+      </div>
+
+      <!-- INVALID -->
+      <div class="state-block" id="invalidState">
+        <div class="invite-icon">⚠️</div>
+        <div class="accept-title">Invitation not found</div>
+        <p class="accept-sub">This invitation link is invalid, expired, or has already been used. Please ask the person who invited you to send a new one.</p>
+        <a href="index.html" class="btn btn-primary btn-full">Go to Curaah Homepage</a>
+      </div>
+
+      <!-- ALREADY ACCEPTED -->
+      <div class="state-block" id="alreadyAcceptedState">
+        <div class="invite-icon">✅</div>
+        <div class="accept-title">Already accepted</div>
+        <p class="accept-sub">You've already accepted this invitation. You can view their dashboard from your Family page.</p>
+        <a href="family.html" class="btn btn-primary btn-full">Go to Family Dashboard</a>
+      </div>
+
+      <!-- VALID INVITE — show details, need login/register -->
+      <div class="state-block" id="validState">
+        <div class="invite-icon">👨‍👩‍👧</div>
+        <div class="accept-title" id="inviteTitle">You've been invited</div>
+        <p class="accept-sub" id="inviteSub">Someone wants to share their health journey with you on Curaah, so you can support them better.</p>
+
+        <div class="invite-detail-card">
+          <div class="invite-detail-row"><span class="invite-detail-label">Relationship</span><span class="invite-detail-value" id="inviteRelationship">—</span></div>
+          <div class="invite-detail-row"><span class="invite-detail-label">Access Level</span><span class="invite-detail-value" id="inviteAccessLevel">—</span></div>
+        </div>
+
+        <div class="permission-list" id="permissionList"></div>
+
+        <div id="needsAuthBlock">
+          <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px;">
+            To accept, please login or create a free Curaah account first.
+          </p>
+          <div style="display:flex;gap:10px;">
+            <a id="loginRedirect" class="btn btn-secondary btn-full">Login</a>
+            <a id="registerRedirect" class="btn btn-primary btn-full">Create Account</a>
+          </div>
+        </div>
+
+        <div id="readyToAcceptBlock" style="display:none;">
+          <button class="btn btn-primary btn-full btn-lg" id="acceptBtn" onclick="acceptInvite()">Accept Invitation</button>
+          <button class="btn btn-secondary btn-full" style="margin-top:10px;" onclick="declineInvite()">Decline</button>
+        </div>
+      </div>
+
+      <!-- SUCCESS -->
+      <div class="state-block" id="successState">
+        <div class="invite-icon">🎉</div>
+        <div class="accept-title">You're connected</div>
+        <p class="accept-sub">You now have access to their health dashboard based on the permissions they've set. You can view it anytime from your Family page.</p>
+        <a href="family.html" class="btn btn-primary btn-full">Go to Family Dashboard</a>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="js/main.js"></script>
+  <script type="module">
+    import { supabase } from './js/supabase.js';
+
+    let inviteRecord = null;
+    let currentSession = null;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
+
+    function showState(id) {
+      document.querySelectorAll('.state-block').forEach(b => b.classList.remove('show'));
+      document.getElementById(id).classList.add('show');
+    }
+
+    async function init() {
+      if (!token) { showState('invalidState'); return; }
+
+      const { data: { session } } = await supabase.auth.getSession();
+      currentSession = session;
+
+      const { data: invite, error } = await supabase
+        .from('family_members')
+        .select('*, patient:patient_user_id(full_name)')
+        .eq('invite_token', token)
+        .single();
+
+      if (error || !invite) { showState('invalidState'); return; }
+
+      inviteRecord = invite;
+
+      if (invite.is_active && invite.accepted_at) {
+        showState('alreadyAcceptedState');
+        return;
+      }
+
+      if (invite.revoked_at) { showState('invalidState'); return; }
+
+      // Render invite details
+      const patientName = invite.patient?.full_name || 'Someone';
+      document.getElementById('inviteTitle').textContent = `${patientName} invited you`;
+      document.getElementById('inviteSub').textContent = `${patientName} wants to share their health journey with you on Curaah, so you can support them better.`;
+      document.getElementById('inviteRelationship').textContent = invite.relationship
+        ? invite.relationship.charAt(0).toUpperCase() + invite.relationship.slice(1)
+        : '—';
+      document.getElementById('inviteAccessLevel').textContent = invite.access_level.replace('_', ' ');
+
+      const permissions = [];
+      if (invite.can_view_medicines) permissions.push('💊 View their medicines & daily adherence');
+      if (invite.can_view_lab_reports) permissions.push('📊 View their lab reports');
+      if (invite.can_receive_alerts) permissions.push('🚨 Receive emergency/SOS alerts');
+      if (invite.can_view_ai_chats) permissions.push('🤖 View their AI Companion conversations');
+
+      document.getElementById('permissionList').innerHTML = permissions.length
+        ? permissions.map(p => `<div class="permission-item">${p}</div>`).join('')
+        : `<div class="permission-item">Emergency notifications only</div>`;
+
+      showState('validState');
+
+      if (session) {
+        document.getElementById('needsAuthBlock').style.display = 'none';
+        document.getElementById('readyToAcceptBlock').style.display = 'block';
+      } else {
+        const returnUrl = encodeURIComponent(window.location.href);
+        document.getElementById('loginRedirect').href = `login.html?return=${returnUrl}`;
+        document.getElementById('registerRedirect').href = `register.html?return=${returnUrl}`;
+      }
+    }
+
+    window.acceptInvite = async function () {
+      if (!currentSession) {
+        showToast('Please login first.', 'error');
+        return;
+      }
+
+      const btn = document.getElementById('acceptBtn');
+      btn.textContent = 'Accepting...';
+      btn.disabled = true;
+
+      try {
+        const { error } = await supabase
+          .from('family_members')
+          .update({
+            family_user_id: currentSession.user.id,
+            is_active: true,
+            accepted_at: new Date().toISOString(),
+            consent_given_at: new Date().toISOString(),
+          })
+          .eq('invite_token', token);
+
+        if (error) throw new Error(error.message);
+
+        showState('successState');
+
+      } catch (err) {
+        btn.textContent = 'Accept Invitation';
+        btn.disabled = false;
+        showToast(err.message || 'Could not accept invitation. Please try again.', 'error');
+      }
+    };
+
+    window.declineInvite = async function () {
+      const confirmed = confirm('Are you sure you want to decline this invitation?');
+      if (!confirmed) return;
+
+      try {
+        await supabase
+          .from('family_members')
+          .update({ revoked_at: new Date().toISOString(), revoke_reason: 'Declined by invitee' })
+          .eq('invite_token', token);
+      } catch (_) { /* best effort */ }
+
+      window.location.href = 'index.html';
+    };
+
+    init();
+  </script>
+
+</body>
+</html>
